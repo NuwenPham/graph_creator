@@ -1,0 +1,12 @@
+/**
+ * Created by Cubla on 16.09.2017.
+ */
+
+
+.my-div-icon{
+    /*width: 100px !important;*/
+    /*height: 40px !important;*/
+    position: absolute;
+    user-select: none;
+    background: rgba(100,100,100,0.6)
+}
