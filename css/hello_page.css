@@ -1,0 +1,37 @@
+/**
+ * Created by Cubla on 16.09.2017.
+ */
+
+.page-hello-page {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    background: #fff;
+    user-select: none;
+}
+
+.page-hello-box {
+    background: #fff;
+    width: 341px;
+    height: 35px;
+}
+
+.ui-hello-page-btn-left{
+    float: left;
+    width: 127px !important;
+}
+
+.ui-hello-page-btn-right{
+    float: right;
+    width: 127px !important;
+    right: 0;
+}
+
+.page-hello-or {
+    padding: 23px;
+    color: #888;
+    top: 10px;
+    font-family: Consolas;
+    position: relative;
+}

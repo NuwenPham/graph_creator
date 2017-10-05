@@ -1,0 +1,32 @@
+.ui-btn{
+    height: 25px !important;
+    width: auto;
+    border: 0 !important;
+    border-bottom: 1px solid #888 !important;
+    border-right: 1px solid #888 !important;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+
+    font-family: 'Consolas';
+    font-size: 19px;
+    padding: 5px;
+    color: #888;
+    user-select: none;
+    text-align: center;
+
+}
+
+.ui-btn:hover{
+    transition: background 0.3s, color 0.2s, border-bottom 0.2s, border-right 0.2s;
+    background: #aaa;
+    color: #fff;
+    border-bottom: 5px solid #666 !important;
+    border-right: 1px solid #888 !important;
+}
+
+.ui-btn:active{
+    transition: background 0.1s, color 0.1s;
+    background: #fff;
+    color: #888;
+}

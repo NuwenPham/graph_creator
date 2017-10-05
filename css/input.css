@@ -1,0 +1,40 @@
+.ui-inp{
+    height: 25px !important;
+    width: 264px;
+    border: 0 !important;
+    border: 1px solid #aaa !important;
+    background: #f5f5f5;
+    position: relative;
+
+    font-family: 'Consolas';
+    font-size: 19px;
+    padding: 5px;
+    color: #888;
+    outline: none;
+    user-select: none;
+    margin-top: 5px;
+}
+
+.ui-inp:focus{
+     transition: background 0.3s, color 0.2s;
+     background: #ddd;
+     color: #777;
+     border: 1px solid #777 !important;
+ }
+.ui-inp:active{
+    transition: background 0.3s, color 0.2s;
+    background: #ccc;
+    color: #fff;
+
+}
+.ui-inp:hover{
+    transition: background 0.3s, color 0.2s;
+    background: #fff;
+    color: #555;
+}
+
+/*.ui-btn:active{*/
+    /*transition: background 0.1s, color 0.1s;*/
+    /*background: #fff;*/
+    /*color: #888;*/
+/*}*/
