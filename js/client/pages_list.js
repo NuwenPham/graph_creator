@@ -1,14 +1,8 @@
 (function (_export) {
     var name = "js/client/pages_list";
     var libs = [
-        "js/client/pages/auth",
-        "js/client/pages/hello_page",
-        "js/client/pages/main_menu",
-        "js/client/pages/error_404",
-        "js/client/pages/game_field",
-        "js/client/pages/games_list",
-        "js/client/pages/reg",
-        "js/client/pages/game_field_2"
+        "js/client/pages/graph_editor",
+        "js/client/pages/error_page"
     ];
     define(name, libs, function () {
         var obj = {};

@@ -8,14 +8,7 @@
     var name = "js/client/navigation";
     var libs = [
         "js/basic",
-        "js/client/pages_list",
-
-        "js/client/pages/hello_page",
-        "js/client/pages/main_menu",
-        "js/client/pages/error_404",
-        "js/client/pages/game_field",
-        "js/client/pages/games_list",
-        "js/client/pages/game_field_2"
+        "js/client/pages_list"
     ];
 
 

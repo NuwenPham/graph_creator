@@ -10,28 +10,3 @@
     background: #fff;
     user-select: none;
 }
-
-.page-hello-box {
-    background: #fff;
-    width: 341px;
-    height: 35px;
-}
-
-.ui-hello-page-btn-left{
-    float: left;
-    width: 127px !important;
-}
-
-.ui-hello-page-btn-right{
-    float: right;
-    width: 127px !important;
-    right: 0;
-}
-
-.page-hello-or {
-    padding: 23px;
-    color: #888;
-    top: 10px;
-    font-family: Consolas;
-    position: relative;
-}
