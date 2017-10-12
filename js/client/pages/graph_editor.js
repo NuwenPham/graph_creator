@@ -37,7 +37,6 @@
             _init: function () {
                 this.__init_wrapper();
                 this.__init_map();
-
             },
 
             __init_wrapper: function () {
@@ -47,15 +46,24 @@
 
                 window.addEventListener("mousedown", function (_event) {
                     if(_event.ctrlKey) {
-                        // debugger;
-                        // console.log(this.__map.__leaflet_map.getBounds());
+                        this.__map.__leaflet_map.invalidateSize();
                         var p = this.__map.__leaflet_map.getBounds();
-                        // this.__map.__leaflet_map._zoom
-                        // debugger;
-                        var ratio = Math.pow(2, (this.__map.__leaflet_map._zoom - 10) / 2);
+                        var center = p.getCenter();
+                        this.__styles = getComputedStyle(this.__wrapper);
+                        var width = parseInt(this.__styles.width) / 2;
+                        var height = parseInt(this.__styles.height) / 2;
+                        var ratio_1 = Math.pow(2, (this.__map.__leaflet_map._zoom - 10) / 2);
+                        var ratio_2 = Math.pow(2, (10 - this.__map.__leaflet_map._zoom ) / 2);
 
+                        var marker_offset_x = (100 / 2) - (100 * ratio_1 / 2);
+                        var marker_offset_y = (40 / 2) - (40 * ratio_1 / 2);
+
+                        var x = (_event.clientX - width + marker_offset_x) * ratio_2;
+                        var y = (_event.clientY - height + marker_offset_y) * ratio_2;
+                        var res_x  = center.lat + x;
+                        var res_y  = center.lng + y;
                         var m = new marker({
-                            coords: [_event.clientX + p._southWest.lat, _event.clientY + p._southWest.lng],
+                            coords: [res_x, res_y],
                             movable: true
                         });
                         this.__map.add_marker(m);
@@ -64,20 +72,8 @@
             },
 
             __init_map: function () {
-                // debugger;
                 this.__map = new map();
                 this.__wrapper.appendChild(this.__map.wrapper());
-                //
-                // var m1 = new marker({
-                //     coords: [200,50],
-                //     movable: true
-                // });
-                // this.__map.add_marker(m1);
-                //
-                // var m2 = new marker({
-                //     movable: true
-                // });
-                // this.__map.add_marker(m2);
             },
 
             wrapper: function(){

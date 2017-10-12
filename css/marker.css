@@ -8,5 +8,6 @@
     /*height: 40px !important;*/
     position: absolute;
     user-select: none;
-    background: rgba(100,100,100,0.6)
+    background: rgba(100,100,100,0.6);
+    border-radius: 5px;
 }

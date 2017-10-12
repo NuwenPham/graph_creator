@@ -33,7 +33,7 @@
             },
 
             __init_marker: function () {
-                var el = this.__el = document.createElement("dom");
+                var el = this.__el = document.createElement("div");
                 el.setAttribute("class", "my-div-icon");
 
                 this.__icon = new L.DomMarkers.icon({
