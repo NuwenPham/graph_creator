@@ -55,11 +55,11 @@
                         var ratio_1 = Math.pow(2, (this.__map.__leaflet_map._zoom - 10) / 2);
                         var ratio_2 = Math.pow(2, (10 - this.__map.__leaflet_map._zoom ) / 2);
 
-                        var marker_offset_x = (100 / 2) - (100 * ratio_1 / 2);
-                        var marker_offset_y = (40 / 2) - (40 * ratio_1 / 2);
+                        var marker_offset_x = (100 / 2) * ratio_1;
+                        var marker_offset_y = (40 / 2) * ratio_1;
 
-                        var x = (_event.clientX - width + marker_offset_x) * ratio_2;
-                        var y = (_event.clientY - height + marker_offset_y) * ratio_2;
+                        var x = (_event.clientX - width - marker_offset_x) * ratio_2;
+                        var y = (_event.clientY - height - marker_offset_y) * ratio_2;
                         var res_x  = center.lat + x;
                         var res_y  = center.lng + y;
                         var m = new marker({

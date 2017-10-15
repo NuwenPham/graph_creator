@@ -46,6 +46,7 @@
                 this.__marker = L.marker(this._opts.coords, {
                     "icon": this.__icon
                 });
+
             },
 
             __events: function () {

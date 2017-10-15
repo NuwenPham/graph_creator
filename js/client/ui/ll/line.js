@@ -21,13 +21,16 @@
                     height: 0
                 };
                 Object.extend(options, _options);
-                lay.prototype.constructor.call(this, options);
+
 
                 this.__x1 = 0;
                 this.__y1 = 0;
                 this.__x2 = 0;
                 this.__y2 = 0;
 
+                this.__size_x = 12000;
+                this.__size_y = 12000;
+                lay.prototype.constructor.call(this, options);
                 this._init();
             },
 
@@ -54,16 +57,16 @@
                 this.__marker = L.marker(this._opts.coords, {
                     "icon": this.__icon
                 });
-                this.__svg.setAttribute("viewBox", "0 0 2000 2000");
+                this.__svg.setAttribute("viewBox", "0 0 " + this.__size_x + " " + this.__size_y);
 
 
                 //
                 //this.__svg.style.overflow = "initial";
-                this.__svg.style.width = "2000px";
-                this.__svg.style.height = "2000px";
+                this.__svg.style.width = this.__size_x + "px";
+                this.__svg.style.height = this.__size_y + "px";
                 this.__svg.style.position = "relative";
-                this.__svg.style.left = "-1000px";
-                this.__svg.style.top = "-1000px";
+                this.__svg.style.left = -(this.__size_x / 2) + "px";
+                this.__svg.style.top = -(this.__size_y / 2) + "px";
             },
 
             __init_line: function () {
@@ -101,16 +104,16 @@
             },
 
             set_start: function (x, y) {
-                this.__line.setAttribute("x1", x + 1000);
-                this.__line.setAttribute("y1", y + 1000);
+                this.__line.setAttribute("x1", x + this.__size_x / 2);
+                this.__line.setAttribute("y1", y + this.__size_y / 2);
                 this.__x1 = x;
                 this.__y1 = y;
                 this.__calc_icon();
             },
 
             set_end: function (x, y) {
-                this.__line.setAttribute("x2", x+ 1000);
-                this.__line.setAttribute("y2", y+ 1000);
+                this.__line.setAttribute("x2", x + this.__size_x / 2);
+                this.__line.setAttribute("y2", y + this.__size_y / 2);
                 this.__x2 = x;
                 this.__y2 = y;
                 this.__calc_icon();
