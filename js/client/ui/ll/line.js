@@ -28,8 +28,8 @@
                 this.__x2 = 0;
                 this.__y2 = 0;
 
-                this.__size_x = 12000;
-                this.__size_y = 12000;
+                this.__size_x = 1000;
+                this.__size_y = 1000;
                 lay.prototype.constructor.call(this, options);
                 this._init();
             },

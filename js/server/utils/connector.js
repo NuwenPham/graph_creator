@@ -43,6 +43,7 @@ var connector = basic.inherit({
         // член
         console.log("close CHLEN:\n");
         this.trigger("closed", {reason: "clen"});
+        delete this._connections[_connection_id];
     },
 
     _on_message: function(_connection_id, _message){
@@ -60,16 +61,33 @@ var connector = basic.inherit({
         connection.on('close', this._on_close.bind(this, this._counter));
         this._connections[this._counter] = connection;
 
-        this.trigger("new_connection", this._counter );
-        this._counter++;
+        //debugger;
+        this.trigger("new_connection",  this._counter++ );
+
     },
 
     send: function(_connection_id, _data) {
         var connection = this._connections[_connection_id];
+        if (!connection) {
+            return;
+        }
+
         var str = JSON.stringify(_data);
         console.log("OUT:\n" + str);
-        connection.send(str);
+
+        //debugger;
+        var send = function () {
+            try {
+                connection.send(str);
+            } catch (e) {
+                console.log("ERROR: ", e);
+                send();
+            }
+        }.bind(this);
+
+        send();
     }
+
 });
 
 module.exports = connector;

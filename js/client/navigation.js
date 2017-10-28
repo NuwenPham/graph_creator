@@ -22,7 +22,7 @@
         var navigation = basic.inherit({
             constructor: function navigation(_options) {
                 var options = {
-                    redirect_error_page: "error_404"
+                    redirect_error_page: "hello_page"
                 };
                 Object.extend(options, _options);
                 basic.prototype.constructor.call(this, options);
@@ -46,13 +46,18 @@
                 this._history = [];
             },
 
-            open: function (_id) {
+            open: function (_id, _options) {
+                var is_break = this.trigger("before_open");
+                if(is_break){
+                    return;
+                }
+
                 var is_error_page = false;
                 if (!pages_map[_id]) {
                     _id = this._opts.redirect_error_page;
                     is_error_page = true;
                 }
-                var _page = new pages_map[_id]();
+                var _page = new pages_map[_id](_options);
                 var elem = _page.wrapper();
 
                 //debugger;
@@ -64,6 +69,19 @@
                 this._history.push(_id);
                 this._last_child && document.body.removeChild(this._last_child);
                 this._last_child = elem;
+            },
+
+            parse_query: function () {
+                var query = location.search.slice(1);
+                var arr_args = query.split("&");
+                var a = 0;
+                var res = {};
+                while( a < arr_args.length){
+                    var arr_val_key = arr_args[a].split("=");
+                    res[arr_val_key[0]] = arr_val_key[1];
+                    a++;
+                }
+                return res;
             },
 
             back: function(){

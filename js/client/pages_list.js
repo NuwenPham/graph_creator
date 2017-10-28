@@ -2,7 +2,12 @@
     var name = "js/client/pages_list";
     var libs = [
         "js/client/pages/graph_editor",
-        "js/client/pages/error_page"
+        "js/client/pages/hello_page",
+        "js/client/pages/auth",
+        "js/client/pages/reg",
+        "js/client/pages/error_page",
+        "js/client/pages/ccp_auth_page",
+        "js/client/pages/ccp_auth_response"
     ];
     define(name, libs, function () {
         var obj = {};

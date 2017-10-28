@@ -19,6 +19,7 @@ var requests_tree = {
     }
 };
 
+
 var client_enter_point = function (_data) {
     var connection_id = _data.connection_id;
     var data = _data.data;
@@ -42,13 +43,3 @@ var client_enter_point = function (_data) {
 ward.dispatcher().on("enter_point", client_enter_point.bind(this));
 
 
-// example db api
-//var db = new leveldb();
-//db.set("chlen", { "sadf": 1, "sss": 2, "sdfsd": 3 });
-//db.get("chlen").then(function (_data) {
-//    console.log(_data);
-//},function () {
-//    debugger;
-//});
-//db.remove("chlen");
-//db.close();

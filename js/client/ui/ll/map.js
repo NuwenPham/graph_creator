@@ -239,19 +239,9 @@
             },
 
             __on_map_zoom: function (_event) {
-                var markers = this.markers();
-                var ratio = Math.pow(2, (_event.target._zoom - 10) / 2);
-
-                for(var k in markers){
-                    var mrk = markers[k].instance;
-                    var el = mrk.dom();
-                    var width = mrk._opts.width * ratio;
-                    var height = mrk._opts.height * ratio;
-                    el.style.width = width + "px";
-                    el.style.height = height + "px";
-                }
 
 
+                this.update_all_markers();
                 this.update_all_links();
             },
 
@@ -325,6 +315,24 @@
 
             get_link: function (_lid) {
                 return this.__links[_lid];
+            },
+
+            update_all_markers: function () {
+                var markers = this.markers();
+                var ratio = Math.pow(2, (this.lm()._zoom - 10) / 2);
+
+                for(var k in markers){
+                    var mrk = markers[k].instance;
+                    var el = mrk.dom();
+                    var width = mrk._opts.width * ratio;
+                    var height = mrk._opts.height * ratio;
+                    el.style.width = width + "px";
+                    el.style.height = height + "px";
+
+                    el.style.fontSize = (mrk._opts.font_size * ratio) + "px";
+
+                }
+
             },
 
             update_all_links: function () {

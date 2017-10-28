@@ -18,6 +18,7 @@
                 var options = {
                     coords: [2, 2],
                     width: 100,
+                    font_size: 13,
                     height: 40
                 };
                 Object.extend(options, _options);
@@ -46,6 +47,9 @@
                 this.__marker = L.marker(this._opts.coords, {
                     "icon": this.__icon
                 });
+
+                this.__el.innerText = "sadf";
+                this.__el.style.fontSize = this._opts.font_size + "px";
 
             },
 

@@ -23,28 +23,41 @@
         v.point = point;
 
 
-        // var d = require("js/client/dispatcher");
-        // var dispatcher = new d();
+         var d = require("js/client/dispatcher");
+         var dispatcher = new d();
 
         _export.nav = new navigation();
-        var page = location.hash !== undefined && (location.hash).slice(1);
-        _export.nav.open( page || "graph_editor" );
 
-        // var handshake_handler = function (_data) {
-        //
-        //     _export.server = Object.create(null);
-        //     _export.server.server_id = _data.server_id;
-        //
-        //     _export.test = new test();
-        //     _export.nav = new navigation();
-        //
-        //     var page = location.hash !== undefined && (location.hash).slice(1);
-        //
-        //     _export.nav.open( page || "hello_page" );
-        // };
-        //
-        // dispatcher.on("new_connection", handshake_handler);
-        // _export.dispatcher = dispatcher;
+
+        //_export.nav = new navigation();
+        //var page = location.hash !== undefined && (location.hash).slice(1);
+        //_export.nav.open( page || "hello_page" );
+
+         var handshake_handler = function (_data) {
+
+             _export.server = Object.create(null);
+             _export.server.server_id = _data.server_id;
+
+             var page = location.hash !== undefined && (location.hash).slice(1);
+
+             var query = nav.parse_query();
+             if(query.state) {
+                 sessionStorage.setItem("code", query.code);
+                 location.href = location.origin + location.pathname + "#" + query.state;
+                 return;
+             }
+
+
+             _export.nav.open( page || "hello_page" );
+         };
+
+         dispatcher.on("new_connection", handshake_handler);
+         _export.dispatcher = dispatcher;
+
+
+        var before_open = function () {return false;};
+
+        nav.on("before_open", before_open);
 
     });
 })(window);

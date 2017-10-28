@@ -60,12 +60,12 @@
                         if (this._events[a].name == _eventName)
                             if (_params != undefined) {
                                 if (this._events[a].context != undefined) {
-                                    this._events[a].callback.call(this._events[a].context, _params);
+                                    return this._events[a].callback.call(this._events[a].context, _params);
                                 } else {
-                                    this._events[a].callback.call(this, _params);
+                                    return this._events[a].callback.call(this, _params);
                                 }
                             } else {
-                                this._events[a].callback.call(this);
+                                return this._events[a].callback.call(this);
                             }
                         a++;
                     }

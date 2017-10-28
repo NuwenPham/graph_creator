@@ -48,7 +48,7 @@ var dispatcher = basic.inherit({
     },
 
     _on_closed: function(_data){
-        debugger;
+        //debugger;
     },
 
     add: function (_callback) {

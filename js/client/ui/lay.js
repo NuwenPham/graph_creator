@@ -108,6 +108,14 @@
                 var data = this.__listeners[_lid];
                 this._wrapper.removeEventListener(data.type, data.callback);
                 delete this.__listeners[_lid];
+            },
+
+            value: function () {
+                return this._wrapper.value;
+            },
+
+            inner_text: function(_text){
+                this._wrapper.innerText = _text;
             }
         });
 

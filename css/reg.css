@@ -35,3 +35,15 @@
     font-family: Consolas;
     position: relative;
 }
+
+.log_lay {
+    height: auto;
+    border: 1px solid #f7f1f1;
+    box-sizing: border-box;
+    width: 276px;
+    margin-top: 10px;
+    min-height: 30px;
+    padding: 3px;
+    color: #fd9a9a;
+    font-family: monospace;
+}
