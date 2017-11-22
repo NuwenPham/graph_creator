@@ -76,6 +76,7 @@
                             text: rnd > 0.5 ? "J144420" : "5ZXX-0"
                         });
                         this.__map.add_marker(m);
+                        this.__map.update_all_markers();
                     }
                 }.bind(this))
             },
