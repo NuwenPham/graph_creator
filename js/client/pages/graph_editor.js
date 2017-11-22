@@ -39,6 +39,10 @@
                 this.__init_map();
             },
 
+            afterInsert: function () {
+                // this.__wrapper.style.height = "100%";
+            },
+
             __init_wrapper: function () {
                 this.__wrapper = document.createElement("div");
                 this.__wrapper.setAttribute("class", "page-hello-page centered-outer");
@@ -62,9 +66,14 @@
                         var y = (_event.clientY - height - marker_offset_y) * ratio_2;
                         var res_x  = center.lat + x;
                         var res_y  = center.lng + y;
+
+
+                        var rnd = Math.random() > 0.5;
                         var m = new marker({
                             coords: [res_x, res_y],
-                            movable: true
+                            movable: true,
+                            has_bonus: true,
+                            text: rnd > 0.5 ? "J144420" : "5ZXX-0"
                         });
                         this.__map.add_marker(m);
                     }

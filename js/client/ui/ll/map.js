@@ -187,7 +187,8 @@
                 if(!this.__current_marker) {
 
                     if(_event.ctrlKey && _event.altKey){
-                        this.remove_marker(_mid);
+                        this.__erase_marker_data(_mid);
+                        // this.remove_marker(_mid);
                         _event.stopPropagation();
                         this.lm().dragging.enable();
                         return;
@@ -230,6 +231,10 @@
             },
 
             __on_marker_up: function (_event) {
+                if(this.__holding_start_mid){
+                    this.__erase_holders();
+                }
+
                 if(this.__current_marker) {
                     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
                     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
@@ -329,8 +334,35 @@
                     el.style.width = width + "px";
                     el.style.height = height + "px";
 
-                    el.style.fontSize = (mrk._opts.font_size * ratio) + "px";
 
+                    // mrk.__head_el
+                    mrk.__head_el_right.style.fontSize = (mrk._opts.font_size * ratio) + "px";
+
+                    if(this.lm()._zoom < 8){
+                        mrk.__head_el_right.style.display = "none";
+                        mrk.__head_el_bonus.style.display = "none";
+                    } else {
+                        mrk.__head_el_right.style.display = "block";
+                        mrk.__head_el_bonus.style.display = "block";
+                    }
+
+                    if(mrk._opts.has_bonus) {
+                        if(this.lm()._zoom < 8){
+                            mrk.__head_el_bonus.style.display = "none";
+                        } else {
+                            mrk.__head_el_bonus.style.display = "block";
+                        }
+
+                        var bw = mrk._opts.bonus_ui.width * ratio;
+                        var bh = mrk._opts.bonus_ui.height * ratio;
+
+                        var margin = mrk._opts.bonus_ui.margin * ratio;
+
+                        mrk.__head_el_bonus.style.width = bw + "px";
+                        mrk.__head_el_bonus.style.height = bh + "px";
+                        mrk.__head_el_bonus.style.margin = margin + "px " + margin + "px 0px 0px";
+
+                    }
                 }
 
             },
@@ -398,7 +430,7 @@
                 });
                 var start_mid = this.add_marker(start_m, true);
 
-                coords = this.calculate_for_marker(_mid, _event.clientX, _event.clientY, holder_width, holder_height);
+                var coords = this.calculate_for_marker(_mid, _event.clientX, _event.clientY, holder_width, holder_height);
                 var new_m = new marker({
                     width:holder_width,
                     height:holder_height,
@@ -488,6 +520,13 @@
                     return;
                 }
 
+                // debugger;
+                // var md = this.get_marker(_mid);
+                // debugger;
+                // md.instance.remove_class("my-div-icon");
+                // md.instance.add_class("my-div-icon-over");
+
+
                 this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
                 this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
 
@@ -515,6 +554,38 @@
                     this.__current_marker = null;
                 }
 
+            },
+
+            __erase_holders: function () {
+                this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
+                this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
+
+                this.remove_link(this.__holding_lid);
+                this.remove_marker(this.__holding_start_mid);
+                this.remove_marker(this.__holding_end_mid);
+
+                this.__holding_start_mid = undefined;
+                this.__holding_end_mid = undefined;
+                this.__holding_lid = undefined;
+                this.__holding_source_mid = undefined;
+
+                this.__remove_from_all_markers_over();
+            },
+
+            __erase_marker_data: function (_mid) {
+                var links = this.__marker_on_link_attach_collection[_mid];
+
+                while (links.length > 0) {
+                    var lid = links[links.length - 1].lid;
+
+                    var ltmac = this.__link_to_markers_attach_collection[lid];
+                    ltmac.start_mid && this.detach_link_from(lid, ltmac.start_mid);
+                    ltmac.end_mid && this.detach_link_from(lid, ltmac.end_mid);
+
+                    this.remove_link(lid);
+                }
+
+                this.remove_marker(_mid);
             }
 
         });

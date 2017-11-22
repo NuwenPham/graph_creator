@@ -90,8 +90,8 @@
                     case "response_auth":
                         if (data.success) {
                             sessionStorage.setItem("token", data.token);
-                            nav.open("ccp_auth_page", {
-                                from: "reg_page"
+                            nav.open("graph_editor", {
+                                from: "auth_page"
                             });
                         } else {
                             this.__error_lay.inner_text(data.text);
