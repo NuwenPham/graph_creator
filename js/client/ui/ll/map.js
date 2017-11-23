@@ -221,6 +221,12 @@
                     var _marker = this.get_marker(this.__current_marker).instance.marker();
                     var _map = this.lm();
                     var mouse_coords = new L.Point(_event.clientX, _event.clientY);
+
+                    if(this._opts.text == ""){
+                        // да да это тяжелая наркомания
+                        mouse_coords = new L.Point(_event.clientX + 120, _event.clientY);
+                    }
+
                     var diff = mouse_coords.subtract(this.__start_mouse_coords);
                     var res = this.__start_marker_point.add(diff);
                     var latlon = _map.layerPointToLatLng(res);
@@ -233,6 +239,10 @@
             __on_marker_up: function (_event) {
                 if(this.__holding_start_mid){
                     this.__erase_holders();
+                }
+
+                if(this.__is_over_on_marker){
+                    this.__connect();
                 }
 
                 if(this.__current_marker) {
@@ -493,8 +503,13 @@
                 for(var k in this.__markers){
                     var data = this.__markers[k];
                     if(data.instance.is_movable()) {
-                        data.mouseover = this.__on_marker_over.bind(this, k);
-                        data.instance.dom().addEventListener("mouseover", data.mouseover);
+
+                        if(data.instance._opts.text != "") {
+                            data.mouseover = this.__on_marker_over.bind(this, k);
+                            data.mouseout = this.__on_marker_out.bind(this, k);
+                            data.instance.dom().addEventListener("mouseover", data.mouseover);
+                            data.instance.dom().addEventListener("mouseout", data.mouseout);
+                        }
                     }
                 }
             },
@@ -504,21 +519,36 @@
 
                 for(var k in this.__markers){
                     var data = this.__markers[k];
-                    if(data.instance.is_movable()) {
-                        data.instance.dom().removeEventListener("mouseover", data.mouseover);
+                    if(data.instance._opts.text != "") {
+                        if (data.instance.is_movable()) {
+                            data.instance.dom().removeEventListener("mouseover", data.mouseover);
+                            data.instance.dom().removeEventListener("mouseout", data.mouseout);
+                        }
                     }
                 }
             },
 
             __on_marker_over: function (_mid) {
 
-                if(_mid == this.__holding_source_mid){
+                if (_mid == this.__holding_source_mid) {
                     return;
                 }
 
-                if(this.get_marker(_mid).is_holder){
+                if (this.get_marker(_mid).is_holder) {
                     return;
                 }
+
+                //
+                // if(!this.__is_over_on_marker){
+                //     this.__is_over_on_marker = true;
+                // }
+
+                this.__is_over_on_marker = true;
+                this.__overed_marker = _mid;
+
+                var data = this.get_marker(_mid);
+
+                console.log("over + [" + data.instance._opts.text + "]");
 
                 // debugger;
                 // var md = this.get_marker(_mid);
@@ -527,14 +557,27 @@
                 // md.instance.add_class("my-div-icon-over");
 
 
+            },
+
+            __on_marker_out: function () {
+                if(this.__overed_marker) {
+                    var data = this.get_marker(this.__overed_marker);
+                    console.log("out + [" + data.instance._opts.text + "]");
+                }
+                this.__is_over_on_marker = false;
+                delete this.__overed_marker;
+            },
+
+            __connect: function () {
+
                 this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
                 this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
 
                 this.attach_link_to(this.__holding_lid, this.__holding_source_mid, true);
-                this.attach_link_to(this.__holding_lid, _mid, false);
+                this.attach_link_to(this.__holding_lid, this.__overed_marker, false);
 
                 this.update_marker_link(this.__holding_source_mid);
-                this.update_marker_link(_mid);
+                this.update_marker_link(this.__overed_marker);
 
                 this.__remove_from_all_markers_over();
 
@@ -545,14 +588,14 @@
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
                 this.__holding_source_mid = undefined;
-
-
-                if(this.__current_marker) {
-                    window.removeEventListener("mousemove", this.__actions.__on_marker_move);
-                    window.removeEventListener("mouseup", this.__actions.__on_marker_up);
-                    this.lm().dragging.enable();
-                    this.__current_marker = null;
-                }
+                //
+                //
+                // if(this.__current_marker) {
+                //     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
+                //     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
+                //     this.lm().dragging.enable();
+                //     this.__current_marker = null;
+                // }
 
             },
 
