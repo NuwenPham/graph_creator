@@ -4,22 +4,22 @@
 (function (_export) {
     var name = "js/client/ui/lay";
     var libs = [
-        "js/basic"
+        "js/client/ui/ui"
     ];
 
     load_css("css/lay.css");
 
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var ui = require("js/client/ui/ui");
         var id = 0;
 
-        var lay = basic.inherit({
+        var lay = ui.inherit({
             constructor: function lay(_options) {
                 var options = {
                     elem_type: "div"
                 };
                 Object.extend(options, _options);
-                basic.prototype.constructor.call(this, options);
+                ui.prototype.constructor.call(this, options);
                 this._init();
             },
 
@@ -90,6 +90,10 @@
                 this._wrapper.appendChild(_lay.wrapper());
             },
 
+            remove: function (_lay) {
+                this._wrapper.removeChild(_lay.wrapper());
+            },
+
             wrapper: function(){
                 return this._wrapper;
             },
@@ -99,7 +103,7 @@
                 this.__listeners[lid] = {
                     type: _type, callback: _callback
                 };
-                this._wrapper.addEventListener(_type, _callback);
+                this._wrapper.addEventListener(_type, _callback, false);
 
                 return lid;
             },

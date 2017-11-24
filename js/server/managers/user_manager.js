@@ -109,7 +109,8 @@ var users = basic.inherit({
     get_user_by_mail: function (_mail) {
         var p = new promise();
         ward.level().get(make_key(_mail)).then(function (_data) {
-            p.resolve(_data.data);
+            //debugger;
+            p.resolve(_data);
         }.bind(this), function (_err) {
             //console.log(_err);
             p.reject();
@@ -120,6 +121,7 @@ var users = basic.inherit({
     attach_eve_account: function (_mail, _account_data) {
         var p = new promise();
         ward.level().get(make_key(_mail)).then(function (_data) {
+            debugger;
             var user_data = _data.data;
             var accounts = user_data.eve_accounts;
             if(!accounts){
@@ -138,11 +140,17 @@ var users = basic.inherit({
                 character_owner_hash: _account_data.character_owner_hash,
                 access_token: _account_data.access_token,
                 token_type: _account_data.token_type,
-                refresh_token: _account_data.refresh_token,
+                refresh_token: _account_data.refresh_token
             };
-            p.resolve();
+
+            user_data.eve_accounts = accounts;
+            return ward.level().set(make_key(_mail), _data);
         }.bind(this), function (_err) {
             p.reject("such user does not exist");
+        }.bind(this)).then(function () {
+            p.resolve();
+        }.bind(this), function () {
+            p.reject("can not write this mail");
         }.bind(this));
         return p.native;
     },

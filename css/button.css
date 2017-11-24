@@ -21,7 +21,7 @@
     transition: background 0.3s, color 0.2s, border-bottom 0.2s, border-right 0.2s;
     background: #aaa;
     color: #fff;
-    border-bottom: 5px solid #666 !important;
+    border-bottom: 2px solid #666 !important;
     border-right: 1px solid #888 !important;
 }
 

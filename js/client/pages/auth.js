@@ -12,6 +12,7 @@
     var libs = [
         "js/basic",
         "js/client/ui/button",
+        "js/client/ui/lay",
         "js/client/ui/input"
     ];
 
@@ -21,6 +22,7 @@
         var basic = require("js/basic");
         var button = require("js/client/ui/button");
         var input = require("js/client/ui/input");
+        var lay = require("js/client/ui/lay");
 
 
         var auth = basic.inherit({
@@ -80,6 +82,12 @@
                     top: "5px"
                 });
                 this.__btn_submit.add_event("click", this.__on_auth_click.bind(this));
+
+
+                this.__error_lay = new lay();
+                this.__content_box.appendChild(this.__error_lay.wrapper());
+                this.__error_lay.remove_class("ui-lay");
+                this.__error_lay.add_class("log_lay");
             },
 
             __core_handler: function (_event) {
@@ -90,8 +98,8 @@
                     case "response_auth":
                         if (data.success) {
                             sessionStorage.setItem("token", data.token);
-                            nav.open("ccp_auth_page", {
-                                from: "reg_page"
+                            nav.open("common_page", {
+                                from: "auth_page"
                             });
                         } else {
                             this.__error_lay.inner_text(data.text);

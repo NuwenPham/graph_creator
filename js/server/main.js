@@ -12,10 +12,12 @@ global.ward = new _ward();
 // requests
 var game = require("./requests/game").requests;
 var auth = require("./requests/auth").requests;
+var user = require("./requests/user").requests;
 var requests_tree = {
     api: {
         game: game,
-        auth: auth
+        auth: auth,
+        user: user
     }
 };
 

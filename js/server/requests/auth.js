@@ -94,7 +94,7 @@ var game = {
     },
     auth: function (_data) {
         var mail = _data.event.mail;
-        var pass = _data.event.pass;
+        var pass = _data.event.pass_1;
 
         if (!check_mail(mail)) {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
@@ -108,8 +108,7 @@ var game = {
         }
 
         ward.users().get_user_by_mail(mail).then(function (_event) {
-
-            if(_data.pass != pass){
+            if(_event.data.pass != pass){
                 // incorrect password
                 ward.dispatcher().send(_data.connection_id, _data.server_id, {
                     client_id: _data.client_id,
@@ -122,7 +121,6 @@ var game = {
             }
 
             ward.users().get_user_by_mail(mail).then(function (_user_data) {
-                //debugger;
                 var token = ward.tokens().create_token(_user_data.id, 1000 * 60 * 60 * 24);
 
                 ward.dispatcher().send(_data.connection_id, _data.server_id, {
@@ -272,7 +270,7 @@ var request_ccp_auth = function (_code) {
     request.post(options, function (error, response, body) {
         if (!error) {
             console.log(body);
-            p.resolve(body);
+            p.resolve(JSON.parse(body));
         } else {
             p.reject(error);
         }
@@ -304,7 +302,7 @@ var request_refresh_token = function (_refresh_token) {
     request.post(options, function (error, response, body) {
         if (!error) {
             console.log(body);
-            p.resolve(body);
+            p.resolve(JSON.parse(body));
         } else {
             p.reject(error);
         }
@@ -317,17 +315,17 @@ var request_user_data = function (_access_token) {
     var p = new promise();
 
     var options = {
-        url: 'https://login.eveonline.com/oauth/token',
+        url: 'https://login.eveonline.com/oauth/verify',
         headers: {
             Authorization: "Bearer " + _access_token,
             Host: "login.eveonline.com"
         }
     };
 
-    request.post(options, function (error, response, body) {
+    request.get(options, function (error, response, body) {
         if (!error) {
             console.log(body);
-            p.resolve(body);
+            p.resolve(JSON.parse(body));
         } else {
             p.reject(error);
         }
@@ -345,11 +343,13 @@ module.exports = {
         reg: game.reg,
         auth: game.auth,
         check_token: game.check_token,
+        user_chars: game.user_chars,
         ccp_auth: game.ccp_auth
     }
 };
 
 var ERROR = {
+    CHAR_ERROR: "CHAR_ERROR",
     ATTACH_FAILED: "ATTACH_FAILED",
     CCP_DATA_FAILED: "CCP_DATA_FAILED",
     CCP_AUTH_FAILED: "CCP_AUTH_FAILED",

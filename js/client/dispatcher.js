@@ -65,6 +65,10 @@
                 return id;
             },
 
+            remove: function (_sid) {
+                delete this._subscribers[_sid];
+            },
+
             send: function(_id, _data){
                 _data.server_id = server.server_id;
                 this._connector.send({
