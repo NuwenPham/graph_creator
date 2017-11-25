@@ -15,6 +15,9 @@
     var l_counter = 2;
 
 
+    var z_index_max = 2000;
+    var z_index_min = 1000;
+
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
         var link = require("js/client/ui/ll/line");
@@ -52,11 +55,6 @@
             },
 
             __init_leaflet: function () {
-
-
-
-
-
                 this.__front = document.createElement("div");
                 this.__front.setAttribute("class", "ll-map-front");
                 this._wrapper.appendChild(this.__front);
@@ -134,12 +132,12 @@
                     _marker.on("mousedown", this.__markers[mid].mousedown);
                 }
 
-
                 var ratio = Math.pow(2, (this.__leaflet_map._zoom - 10) / 2);
                 var width = _marker._opts.width * ratio;
                 var height = _marker._opts.height * ratio;
                 _marker.dom().style.width = width + "px";
                 _marker.dom().style.height = height + "px";
+                _marker.dom().style.zIndex = z_index_max;
 
                 return mid;
             },
@@ -181,12 +179,14 @@
             },
 
             __on_marker_down: function (_mid, _event) {
+                this.modify_z_index(_mid);
 
                 this.lm().dragging.disable();
 
                 if(!this.__current_marker) {
 
                     if(_event.ctrlKey && _event.altKey){
+                        if(window.ddbg) debugger;
                         this.__erase_marker_data(_mid);
                         // this.remove_marker(_mid);
                         _event.stopPropagation();
@@ -195,6 +195,7 @@
                     }
 
                     if(_event.ctrlKey){
+                        //debugger;
                         _mid = this.__create_link_holder(_mid, _event);
                         _event.stopPropagation();
                         //this.lm().dragging.enable();
@@ -222,9 +223,13 @@
                     var _map = this.lm();
                     var mouse_coords = new L.Point(_event.clientX, _event.clientY);
 
-                    if(this._opts.text == ""){
+
+
+                    if(  this.get_marker(this.__current_marker).instance._opts.text == ""){
                         // да да это тяжелая наркомания
-                        mouse_coords = new L.Point(_event.clientX + 120, _event.clientY);
+                        //debugger;
+
+                        mouse_coords = new L.Point(_event.clientX + 10, _event.clientY+ 10);
                     }
 
                     var diff = mouse_coords.subtract(this.__start_mouse_coords);
@@ -237,12 +242,14 @@
             },
 
             __on_marker_up: function (_event) {
-                if(this.__holding_start_mid){
-                    this.__erase_holders();
-                }
-
-                if(this.__is_over_on_marker){
+                if(this.__is_over_on_marker && this.__holding_start_mid){
                     this.__connect();
+
+
+                }
+                //
+                if(this.__holding_start_mid) {
+                    this.__erase_holders();
                 }
 
                 if(this.__current_marker) {
@@ -346,7 +353,9 @@
 
 
                     // mrk.__head_el
-                    mrk.__head_el_right.style.fontSize = (mrk._opts.font_size * ratio) + "px";
+                    mrk.__head_el_right.style.fontSize = (mrk._opts.system.font_size * ratio) + "px";
+                    var margin = mrk._opts.system.margin * ratio;
+                    mrk.__head_el_right.style.margin = (margin) + "px";
 
                     if(this.lm()._zoom < 8){
                         mrk.__head_el_right.style.display = "none";
@@ -366,7 +375,7 @@
                         var bw = mrk._opts.bonus_ui.width * ratio;
                         var bh = mrk._opts.bonus_ui.height * ratio;
 
-                        var margin = mrk._opts.bonus_ui.margin * ratio;
+                        margin = mrk._opts.bonus_ui.margin * ratio;
 
                         mrk.__head_el_bonus.style.width = bw + "px";
                         mrk.__head_el_bonus.style.height = bh + "px";
@@ -562,7 +571,7 @@
             __on_marker_out: function () {
                 if(this.__overed_marker) {
                     var data = this.get_marker(this.__overed_marker);
-                    console.log("out + [" + data.instance._opts.text + "]");
+                    data && console.log("out + [" + data.instance._opts.text + "]");
                 }
                 this.__is_over_on_marker = false;
                 delete this.__overed_marker;
@@ -584,6 +593,7 @@
                 this.remove_marker(this.__holding_start_mid);
                 this.remove_marker(this.__holding_end_mid);
 
+                //debugger;
                 this.__holding_start_mid = undefined;
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
@@ -607,6 +617,7 @@
                 this.remove_marker(this.__holding_start_mid);
                 this.remove_marker(this.__holding_end_mid);
 
+                //debugger;
                 this.__holding_start_mid = undefined;
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
@@ -618,20 +629,34 @@
             __erase_marker_data: function (_mid) {
                 var links = this.__marker_on_link_attach_collection[_mid];
 
-                while (links.length > 0) {
-                    var lid = links[links.length - 1].lid;
+                if(links) {
+                    while (links.length > 0) {
+                        var lid = links[links.length - 1].lid;
 
-                    var ltmac = this.__link_to_markers_attach_collection[lid];
-                    ltmac.start_mid && this.detach_link_from(lid, ltmac.start_mid);
-                    ltmac.end_mid && this.detach_link_from(lid, ltmac.end_mid);
+                        var ltmac = this.__link_to_markers_attach_collection[lid];
+                        ltmac.start_mid && this.detach_link_from(lid, ltmac.start_mid);
+                        ltmac.end_mid && this.detach_link_from(lid, ltmac.end_mid);
 
-                    this.remove_link(lid);
+                        this.remove_link(lid);
+                    }
                 }
 
                 this.remove_marker(_mid);
+            },
+
+            modify_z_index: function (_mid) {
+                var _m = this.get_marker(_mid).instance;
+                for(var k in this.__markers){
+                    var m = this.__markers[k].instance;
+                    m.wrapper().style.zIndex = m.wrapper().style.zIndex - 1;
+                    if(_mid == k){
+                        _m.wrapper().style.zIndex = z_index_max;
+                    }
+                }
             }
 
         });
+
 
         return map;
     })

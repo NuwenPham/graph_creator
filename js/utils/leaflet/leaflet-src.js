@@ -7395,12 +7395,13 @@ var Marker = Layer.extend({
 			setPosition(this._shadow, pos);
 		}
 
-		this._zIndex = pos.y + this.options.zIndexOffset;
+		//this._zIndex = pos.y + this.options.zIndexOffset;
 
 		this._resetZIndex();
 	},
 
 	_updateZIndex: function (offset) {
+		//debugger;
 		this._icon.style.zIndex = this._zIndex + offset;
 	},
 

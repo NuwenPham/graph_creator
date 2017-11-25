@@ -18,9 +18,12 @@
                 var options = {
                     coords: [2, 2],
                     width: 100,
-                    font_size: 15,
                     height: 40,
                     has_bonus: false,
+                    system: {
+                        font_size: 13,
+                        margin: 5
+                    },
                     bonus_ui: {
                         background: "#f0a",
                         width: 10,
@@ -78,6 +81,7 @@
 
             __events: function () {
                 this.__el.addEventListener("mousedown", function (_event) {
+
                     this.trigger("mousedown", _event);
                 }.bind(this));
             },
