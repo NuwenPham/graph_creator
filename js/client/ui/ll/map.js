@@ -15,6 +15,9 @@
     var l_counter = 2;
 
 
+    var z_index_max = 2000;
+    var z_index_min = 1000;
+
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
         var link = require("js/client/ui/ll/line");
@@ -52,11 +55,6 @@
             },
 
             __init_leaflet: function () {
-
-
-
-
-
                 this.__front = document.createElement("div");
                 this.__front.setAttribute("class", "ll-map-front");
                 this._wrapper.appendChild(this.__front);
@@ -134,12 +132,12 @@
                     _marker.on("mousedown", this.__markers[mid].mousedown);
                 }
 
-
                 var ratio = Math.pow(2, (this.__leaflet_map._zoom - 10) / 2);
                 var width = _marker._opts.width * ratio;
                 var height = _marker._opts.height * ratio;
                 _marker.dom().style.width = width + "px";
                 _marker.dom().style.height = height + "px";
+                _marker.dom().style.zIndex = z_index_max;
 
                 return mid;
             },
@@ -181,19 +179,23 @@
             },
 
             __on_marker_down: function (_mid, _event) {
+                this.modify_z_index(_mid);
 
                 this.lm().dragging.disable();
 
                 if(!this.__current_marker) {
 
                     if(_event.ctrlKey && _event.altKey){
-                        this.remove_marker(_mid);
+                        if(window.ddbg) debugger;
+                        this.__erase_marker_data(_mid);
+                        // this.remove_marker(_mid);
                         _event.stopPropagation();
                         this.lm().dragging.enable();
                         return;
                     }
 
                     if(_event.ctrlKey){
+                        //debugger;
                         _mid = this.__create_link_holder(_mid, _event);
                         _event.stopPropagation();
                         //this.lm().dragging.enable();
@@ -220,6 +222,16 @@
                     var _marker = this.get_marker(this.__current_marker).instance.marker();
                     var _map = this.lm();
                     var mouse_coords = new L.Point(_event.clientX, _event.clientY);
+
+
+
+                    if(  this.get_marker(this.__current_marker).instance._opts.text == ""){
+                        // да да это тяжелая наркомания
+                        //debugger;
+
+                        mouse_coords = new L.Point(_event.clientX + 10, _event.clientY+ 10);
+                    }
+
                     var diff = mouse_coords.subtract(this.__start_mouse_coords);
                     var res = this.__start_marker_point.add(diff);
                     var latlon = _map.layerPointToLatLng(res);
@@ -230,6 +242,16 @@
             },
 
             __on_marker_up: function (_event) {
+                if(this.__is_over_on_marker && this.__holding_start_mid){
+                    this.__connect();
+
+
+                }
+                //
+                if(this.__holding_start_mid) {
+                    this.__erase_holders();
+                }
+
                 if(this.__current_marker) {
                     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
                     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
@@ -329,8 +351,37 @@
                     el.style.width = width + "px";
                     el.style.height = height + "px";
 
-                    el.style.fontSize = (mrk._opts.font_size * ratio) + "px";
 
+                    // mrk.__head_el
+                    mrk.__head_el_right.style.fontSize = (mrk._opts.system.font_size * ratio) + "px";
+                    var margin = mrk._opts.system.margin * ratio;
+                    mrk.__head_el_right.style.margin = (margin) + "px";
+
+                    if(this.lm()._zoom < 8){
+                        mrk.__head_el_right.style.display = "none";
+                        mrk.__head_el_bonus.style.display = "none";
+                    } else {
+                        mrk.__head_el_right.style.display = "block";
+                        mrk.__head_el_bonus.style.display = "block";
+                    }
+
+                    if(mrk._opts.has_bonus) {
+                        if(this.lm()._zoom < 8){
+                            mrk.__head_el_bonus.style.display = "none";
+                        } else {
+                            mrk.__head_el_bonus.style.display = "block";
+                        }
+
+                        var bw = mrk._opts.bonus_ui.width * ratio;
+                        var bh = mrk._opts.bonus_ui.height * ratio;
+
+                        margin = mrk._opts.bonus_ui.margin * ratio;
+
+                        mrk.__head_el_bonus.style.width = bw + "px";
+                        mrk.__head_el_bonus.style.height = bh + "px";
+                        mrk.__head_el_bonus.style.margin = margin + "px " + margin + "px 0px 0px";
+
+                    }
                 }
 
             },
@@ -398,7 +449,7 @@
                 });
                 var start_mid = this.add_marker(start_m, true);
 
-                coords = this.calculate_for_marker(_mid, _event.clientX, _event.clientY, holder_width, holder_height);
+                var coords = this.calculate_for_marker(_mid, _event.clientX, _event.clientY, holder_width, holder_height);
                 var new_m = new marker({
                     width:holder_width,
                     height:holder_height,
@@ -461,8 +512,13 @@
                 for(var k in this.__markers){
                     var data = this.__markers[k];
                     if(data.instance.is_movable()) {
-                        data.mouseover = this.__on_marker_over.bind(this, k);
-                        data.instance.dom().addEventListener("mouseover", data.mouseover);
+
+                        if(data.instance._opts.text != "") {
+                            data.mouseover = this.__on_marker_over.bind(this, k);
+                            data.mouseout = this.__on_marker_out.bind(this, k);
+                            data.instance.dom().addEventListener("mouseover", data.mouseover);
+                            data.instance.dom().addEventListener("mouseout", data.mouseout);
+                        }
                     }
                 }
             },
@@ -472,52 +528,135 @@
 
                 for(var k in this.__markers){
                     var data = this.__markers[k];
-                    if(data.instance.is_movable()) {
-                        data.instance.dom().removeEventListener("mouseover", data.mouseover);
+                    if(data.instance._opts.text != "") {
+                        if (data.instance.is_movable()) {
+                            data.instance.dom().removeEventListener("mouseover", data.mouseover);
+                            data.instance.dom().removeEventListener("mouseout", data.mouseout);
+                        }
                     }
                 }
             },
 
             __on_marker_over: function (_mid) {
 
-                if(_mid == this.__holding_source_mid){
+                if (_mid == this.__holding_source_mid) {
                     return;
                 }
 
-                if(this.get_marker(_mid).is_holder){
+                if (this.get_marker(_mid).is_holder) {
                     return;
                 }
+
+                //
+                // if(!this.__is_over_on_marker){
+                //     this.__is_over_on_marker = true;
+                // }
+
+                this.__is_over_on_marker = true;
+                this.__overed_marker = _mid;
+
+                var data = this.get_marker(_mid);
+
+                console.log("over + [" + data.instance._opts.text + "]");
+
+                // debugger;
+                // var md = this.get_marker(_mid);
+                // debugger;
+                // md.instance.remove_class("my-div-icon");
+                // md.instance.add_class("my-div-icon-over");
+
+
+            },
+
+            __on_marker_out: function () {
+                if(this.__overed_marker) {
+                    var data = this.get_marker(this.__overed_marker);
+                    data && console.log("out + [" + data.instance._opts.text + "]");
+                }
+                this.__is_over_on_marker = false;
+                delete this.__overed_marker;
+            },
+
+            __connect: function () {
 
                 this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
                 this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
 
                 this.attach_link_to(this.__holding_lid, this.__holding_source_mid, true);
-                this.attach_link_to(this.__holding_lid, _mid, false);
+                this.attach_link_to(this.__holding_lid, this.__overed_marker, false);
 
                 this.update_marker_link(this.__holding_source_mid);
-                this.update_marker_link(_mid);
+                this.update_marker_link(this.__overed_marker);
 
                 this.__remove_from_all_markers_over();
 
                 this.remove_marker(this.__holding_start_mid);
                 this.remove_marker(this.__holding_end_mid);
 
+                //debugger;
+                this.__holding_start_mid = undefined;
+                this.__holding_end_mid = undefined;
+                this.__holding_lid = undefined;
+                this.__holding_source_mid = undefined;
+                //
+                //
+                // if(this.__current_marker) {
+                //     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
+                //     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
+                //     this.lm().dragging.enable();
+                //     this.__current_marker = null;
+                // }
+
+            },
+
+            __erase_holders: function () {
+                this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
+                this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
+
+                this.remove_link(this.__holding_lid);
+                this.remove_marker(this.__holding_start_mid);
+                this.remove_marker(this.__holding_end_mid);
+
+                //debugger;
                 this.__holding_start_mid = undefined;
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
                 this.__holding_source_mid = undefined;
 
+                this.__remove_from_all_markers_over();
+            },
 
-                if(this.__current_marker) {
-                    window.removeEventListener("mousemove", this.__actions.__on_marker_move);
-                    window.removeEventListener("mouseup", this.__actions.__on_marker_up);
-                    this.lm().dragging.enable();
-                    this.__current_marker = null;
+            __erase_marker_data: function (_mid) {
+                var links = this.__marker_on_link_attach_collection[_mid];
+
+                if(links) {
+                    while (links.length > 0) {
+                        var lid = links[links.length - 1].lid;
+
+                        var ltmac = this.__link_to_markers_attach_collection[lid];
+                        ltmac.start_mid && this.detach_link_from(lid, ltmac.start_mid);
+                        ltmac.end_mid && this.detach_link_from(lid, ltmac.end_mid);
+
+                        this.remove_link(lid);
+                    }
                 }
 
+                this.remove_marker(_mid);
+            },
+
+            modify_z_index: function (_mid) {
+                var _m = this.get_marker(_mid).instance;
+                for(var k in this.__markers){
+                    var m = this.__markers[k].instance;
+                    m.wrapper().style.zIndex = m.wrapper().style.zIndex - 1;
+                    if(_mid == k){
+                        _m.wrapper().style.zIndex = z_index_max;
+                    }
+                }
             }
 
         });
+
 
         return map;
     })

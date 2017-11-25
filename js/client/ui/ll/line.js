@@ -76,7 +76,7 @@
                 this.__line.setAttribute("x2", 0);
                 this.__line.setAttribute("y2", 0);
                 this.__line.setAttribute("stroke-width", "2");
-                this.__line.setAttribute("stroke", "rgb(255,0,0)");
+                this.__line.setAttribute("stroke", "rgb(155,155,155)");
 
                 this.__svg.appendChild(this.__line);
             },

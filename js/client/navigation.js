@@ -66,6 +66,8 @@
                     window.location = "#" + _id;
                 //}
 
+                _page.afterInsert && _page.afterInsert();
+
                 this._history.push(_id);
                 this._last_child && document.body.removeChild(this._last_child);
                 this._last_child = elem;

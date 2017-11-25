@@ -8,6 +8,45 @@
     /*height: 40px !important;*/
     position: absolute;
     user-select: none;
-    background: rgba(100,100,100,0.6);
+    background: rgb(135, 135, 135);
     border-radius: 5px;
+    border: 2px solid #eee;
+    transition: background 0.2s;
+    cursor: move;
+}
+
+.my-div-icon:hover {
+    background: rgb(55, 146, 55);
+    transition: background 0.4s;
+}
+
+.my-div-icon:active {
+    background: rgb(176, 115, 115);
+    transition: background 0.2s;
+}
+
+.my-div-icon-over{
+    user-select: none;
+
+    position: absolute;
+    border-radius: 5px;
+    background: rgb(55, 176, 55);
+    border: 2px solid #eee;
+}
+
+.my-div-icon-head-left {
+    float: right;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #fff;
+    margin: 4px 4px 0px 0px;
+}
+
+.my-div-icon-head-right{
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 12pt;
+    color: #fff;
+    /*font-weight: bold;*/
+    float: right;
+    /*padding: 4px;*/
 }
