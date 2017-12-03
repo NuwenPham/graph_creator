@@ -1,24 +1,14 @@
 /**
  * Created by pham on 8/8/17.
  */
-var promise = require("./utils/promise.js");
 var leveldb = require("./utils/leveldb.js");
 
 
-// дерево, по адресу которого вызывается метод
-var _ward = require("./ward.js");
-global.ward = new _ward();
-
+require("./globals.js");
 // requests
-var game = require("./requests/game").requests;
-var auth = require("./requests/auth").requests;
-var user = require("./requests/user").requests;
+var api = require("./api");
 var requests_tree = {
-    api: {
-        game: game,
-        auth: auth,
-        user: user
-    }
+    api: api
 };
 
 

@@ -8,6 +8,7 @@
         "js/client/pages/error_page",
         "js/client/pages/ccp_auth_page",
         "js/client/pages/ccp_auth_response",
+        "js/client/pages/ccp_refresh_token",
         "js/client/pages/common_page"
     ];
     define(name, libs, function () {

@@ -6,7 +6,6 @@ var levelup = require('level');
 
 
 var basic = require("./../basic");
-var promise = require("./promise");
 
 var leveldb = basic.inherit({
     constructor: function (_options) {

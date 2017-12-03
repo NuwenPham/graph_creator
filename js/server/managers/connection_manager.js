@@ -3,7 +3,6 @@
  */
 
 var basic = require("./../basic");
-var promise = require("./../utils/promise");
 
 var connection_manager = basic.inherit({
     constructor: function connection_manager(_options) {

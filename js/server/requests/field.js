@@ -37,7 +37,6 @@ var field = {
     }
 };
 module.exports = {
-    methods: field,
     requests: {
         request_move_loc: field.request_move_loc,
         request_field_data: field.request_field_data

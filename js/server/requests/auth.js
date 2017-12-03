@@ -5,7 +5,6 @@
 var _game = require("./../game/game.js");
 var _field_requests = require("./field.js");
 var request = require('request');
-var promise = require("./../utils/promise.js");
 
 var game = {
     reg: function (_data) {
@@ -85,10 +84,7 @@ var game = {
                 error_id: ERROR.UNKNOWN
             });
         }.bind(this)).then(function () {
-
-
-
-
+            // ??
         }.bind(this));
 
     },
@@ -250,9 +246,7 @@ var game = {
 var request_ccp_auth = function (_code) {
     var p = new promise();
 
-    var client_id = "804ba189451a4b12af36a1f770d9a12d";
-    var sec_key = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
-    var res = client_id + ":" + sec_key;
+    var res = _CLIENT_ID + ":" + _SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
         url: 'https://login.eveonline.com/oauth/token',
@@ -279,37 +273,6 @@ var request_ccp_auth = function (_code) {
     return p.native;
 };
 
-var request_refresh_token = function (_refresh_token) {
-    var p = new promise();
-
-    var client_id = "804ba189451a4b12af36a1f770d9a12d";
-    var sec_key = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
-    var res = client_id + ":" + sec_key;
-    var encoded = new Buffer(res).toString('base64');
-    var options = {
-        url: 'https://login.eveonline.com/oauth/token',
-        headers: {
-            Authorization: "Basic " + encoded,
-            "Content-Type": "application/x-www-form-urlencoded",
-            Host: "login.eveonline.com"
-        },
-        form: {
-            grant_type: "refresh_token",
-            refresh_token: _refresh_token
-        }
-    };
-
-    request.post(options, function (error, response, body) {
-        if (!error) {
-            console.log(body);
-            p.resolve(JSON.parse(body));
-        } else {
-            p.reject(error);
-        }
-    }.bind(this));
-
-    return p.native;
-};
 
 var request_user_data = function (_access_token) {
     var p = new promise();

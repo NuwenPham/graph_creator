@@ -73,7 +73,7 @@
                     case "response_ccp_auth":
                         if (data.success) {
                             // тогда отправляемся на первую страницу пользователя
-                            nav.open("common_page");
+                            nav.open("graph_editor");
                         } else {
                             switch (data.error_id) {
                                 case ERROR.BAD_TOKEN:

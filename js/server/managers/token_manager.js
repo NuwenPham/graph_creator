@@ -3,7 +3,6 @@
  */
 
 var basic = require("./../basic");
-var promise = require("./../utils/promise");
 
 var tokens = basic.inherit({
     constructor: function tokens(_options) {

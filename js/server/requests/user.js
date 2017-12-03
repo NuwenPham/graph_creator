@@ -3,7 +3,6 @@
  */
 
 var request = require('request');
-var promise = require("./../utils/promise.js");
 
 var user = {
     characters: function (_data) {
@@ -57,9 +56,7 @@ var user = {
 var request_ccp_auth = function (_code) {
     var p = new promise();
 
-    var client_id = "804ba189451a4b12af36a1f770d9a12d";
-    var sec_key = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
-    var res = client_id + ":" + sec_key;
+    var res = _CLIENT_ID + ":" + _SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
         url: 'https://login.eveonline.com/oauth/token',
@@ -89,9 +86,7 @@ var request_ccp_auth = function (_code) {
 var request_refresh_token = function (_refresh_token) {
     var p = new promise();
 
-    var client_id = "804ba189451a4b12af36a1f770d9a12d";
-    var sec_key = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
-    var res = client_id + ":" + sec_key;
+    var res = _CLIENT_ID + ":" + _SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
         url: 'https://login.eveonline.com/oauth/token',

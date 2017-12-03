@@ -1,5 +1,4 @@
 var basic = require("./basic");
-var promise = require("./utils/promise");
 var dispatcher = require("./utils/dispatcher.js");
 var connection_manager = require("./managers/connection_manager.js");
 var user_manager = require("./managers/user_manager.js");

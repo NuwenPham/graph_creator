@@ -94,7 +94,7 @@
                 var data = {
                     response_type: "code",
                     client_id: "804ba189451a4b12af36a1f770d9a12d", // dan
-                    scope: "characterLocationRead",
+                    scope: "esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-clones.read_clones.v1 esi-universe.read_structures.v1 esi-location.read_online.v1",
                     state: "ccp_auth_response",
                     redirect_uri: response_url
                 };

@@ -3,7 +3,6 @@
  */
 
 var basic = require("./../basic");
-var promise = require("./../utils/promise");
 
 var users = basic.inherit({
     constructor: function ward(_options) {
@@ -121,7 +120,7 @@ var users = basic.inherit({
     attach_eve_account: function (_mail, _account_data) {
         var p = new promise();
         ward.level().get(make_key(_mail)).then(function (_data) {
-            debugger;
+           // debugger;
             var user_data = _data.data;
             var accounts = user_data.eve_accounts;
             if(!accounts){
@@ -152,6 +151,42 @@ var users = basic.inherit({
         }.bind(this), function () {
             p.reject("can not write this mail");
         }.bind(this));
+        return p.native;
+    },
+
+    update_account_data: function (_user_id, _account_id, _new_data) {
+        var p = new promise();
+        var mail;
+        this.get_user_mail_by_id(_user_id).then(function(_data){
+            mail = _data;
+            return ward.level().get(make_key(mail));
+        }, function () {
+            //failed on get mail
+            p.reject("failed on get mail");
+            debugger;
+        }).then(function (_data) {
+            var user_data = _data.data;
+            var accounts = user_data.eve_accounts;
+            var acc_data = accounts[_account_id];
+            if(!acc_data){
+                p.reject("such account not attached");
+                return;
+            }
+            for(var k in _new_data){
+                acc_data[k] = _new_data[k];
+            }
+            return ward.level().set(make_key(mail), _data);
+        }, function (_error) {
+            // failed on get user
+            p.reject("failed on get user");
+            debugger;
+        }).then(function () {
+            p.resolve();
+        }, function (_error) {
+            // failed on try set data
+            p.reject("failed on try set data");
+            debugger;
+        });
         return p.native;
     },
 
