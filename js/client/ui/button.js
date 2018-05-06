@@ -28,7 +28,7 @@
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");
                 this.add_class("ui-btn");
-                this._wrapper.innerText = this._opts.text;
+                this.__wrapper.innerText = this._opts.text;
             }
         });
 

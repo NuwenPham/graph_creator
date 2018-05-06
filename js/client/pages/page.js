@@ -5,45 +5,42 @@
 (function (_export) {
     var name = "js/client/pages/page";
     var libs = [
-        "js//client/ui/ui",
+        "js//client/ui/lay",
         "js/client/ui/button"
     ];
 
     define(name, libs, function () {
-        var ui = require("js/client/ui/ui");
+        var lay = require("js/client/ui/lay");
         var button = require("js/client/ui/button");
 
 
-        var page = ui.inherit({
+        var page = lay.inherit({
             constructor: function page(_options) {
                 var options = {
 
                 };
                 Object.extend(options, _options);
-                ui.prototype.constructor.call(this, options);
+                lay.prototype.constructor.call(this, options);
                 this._pre_init();
             },
 
             destructor: function () {
+                lay.prototype.destructor.call(this);
 
             },
 
             _pre_init: function () {
-                this.__init_wrapper();
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
                 this.check_token();
             },
 
-            _init: function(){
+            _after_init: function(){
+                //lay.prototype._init.call(this);
             },
 
             __init_wrapper: function () {
-                this.__wrapper = document.createElement("div");
-                this.__wrapper.setAttribute("class", "page-hello-page centered-outer");
-            },
-
-            wrapper: function(){
-                return this.__wrapper;
+                this.add_class("page-hello-page");
+                this.add_class("centered-outer");
             },
 
             append: function (_lay) {
@@ -69,9 +66,9 @@
                 switch (command) {
                     case "response_check_token":
                         if (data.success) {
-                            this._init();
+                            this._after_init();
                         } else {
-                            console.log("bad token");
+                            console.log("page: bad token");
                             nav.open("reg");
                         }
                         break;

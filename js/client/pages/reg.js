@@ -115,9 +115,12 @@
                         if (data.success) {
 
                             sessionStorage.setItem("token", data.token);
+                            nav.open("common_page", {
+                                from: "reg_page"
+                            });/*
                             nav.open("ccp_auth_page", {
                                 from: "reg_page"
-                            });
+                            });*/
                         } else {
                             this.__error_lay.inner_text(data.text);
                             switch (data.error_id) {

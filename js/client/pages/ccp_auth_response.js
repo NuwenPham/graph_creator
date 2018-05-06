@@ -66,14 +66,15 @@
                         if (data.success) {
                             this._init();
                         } else {
-                            console.log("bad token");
+                            console.log("ccp_auth_response: bad token");
                             nav.open("reg");
                         }
                         break;
                     case "response_ccp_auth":
                         if (data.success) {
                             // тогда отправляемся на первую страницу пользователя
-                            nav.open("graph_editor");
+                            //nav.open("graph_editor");
+                            nav.open("common_page");
                         } else {
                             switch (data.error_id) {
                                 case ERROR.BAD_TOKEN:

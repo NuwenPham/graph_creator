@@ -4,7 +4,7 @@
 (function(_export){
     var name = "js/basic";
     var libs = [
-        //"js/baseClass"
+        "js/baseClass"
     ];
     define( name, libs, function(){
 

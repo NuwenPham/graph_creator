@@ -98,9 +98,12 @@
                     case "response_auth":
                         if (data.success) {
                             sessionStorage.setItem("token", data.token);
-                            nav.open("graph_editor", {
+                            nav.open("common_page", {
                                 from: "auth_page"
                             });
+                           /* nav.open("graph_editor", {
+                                from: "auth_page"
+                            });*/
                         } else {
                             this.__error_lay.inner_text(data.text);
                             switch (data.error_id) {

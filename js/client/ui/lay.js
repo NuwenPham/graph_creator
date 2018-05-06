@@ -30,7 +30,7 @@
             },
 
             _init: function () {
-                this._wrapper = document.createElement(this._opts.elem_type);
+                this.__wrapper = document.createElement(this._opts.elem_type);
                 this.add_class("ui-lay");
                 this.__listeners = {};
             },
@@ -40,34 +40,34 @@
                     if (_key.toString() == "[object Object]") {
                         for (var k in _key) {
                             if (_key.hasOwnProperty(k)) {
-                                this._wrapper.style[k] = _key[k];
+                                this.__wrapper.style[k] = _key[k];
                             }
                         }
                     } else {
-                        return this._wrapper.style[_key];
+                        return this.__wrapper.style[_key];
                     }
                 }
 
-                this._wrapper.style[_key] = _value;
+                this.__wrapper.style[_key] = _value;
             },
 
             add_class: function (_class_name) {
-                var classes = this._wrapper.getAttribute("class") || " ";
+                var classes = this.__wrapper.getAttribute("class") || " ";
                 var cls_arr = classes.split(" ");
                 cls_arr.unshift(_class_name);
                 var res = cls_arr.join(" ");
-                this._wrapper.setAttribute("class", res);
+                this.__wrapper.setAttribute("class", res);
             },
 
             remove_class: function (_class_name) {
-                var classes = this._wrapper.getAttribute("class");
+                var classes = this.__wrapper.getAttribute("class");
                 if (classes == undefined) {
                     return;
                 }
                 var cls_arr = classes.split(" ");
                 cls_arr.splice(cls_arr.indexOf(_class_name), 1);
                 var res = cls_arr.join(" ");
-                this._wrapper.setAttribute("class", res);
+                this.__wrapper.setAttribute("class", res);
             },
 
             attrs: function (_key, _value) {
@@ -75,27 +75,29 @@
                     if (_key.toString() == "[object Object]") {
                         for (var k in _key) {
                             if (_key.hasOwnProperty(k)) {
-                                this._wrapper.setAttribute(k, _key[k]);
+                                this.__wrapper.setAttribute(k, _key[k]);
                             }
                         }
                     } else {
-                        return this._wrapper.getAttribute(_key);
+                        return this.__wrapper.getAttribute(_key);
                     }
                     return;
                 }
-                this._wrapper.setAttribute(_key, _value);
+                this.__wrapper.setAttribute(_key, _value);
             },
 
             append: function (_lay) {
-                this._wrapper.appendChild(_lay.wrapper());
+                this.__wrapper.appendChild(_lay.wrapper());
+                this.add_child(_lay);
             },
 
             remove: function (_lay) {
-                this._wrapper.removeChild(_lay.wrapper());
+                this.__wrapper.removeChild(_lay.wrapper());
+                this.remove_child(_lay);
             },
 
             wrapper: function(){
-                return this._wrapper;
+                return this.__wrapper;
             },
 
             add_event: function (_type, _callback) {
@@ -103,23 +105,23 @@
                 this.__listeners[lid] = {
                     type: _type, callback: _callback
                 };
-                this._wrapper.addEventListener(_type, _callback, false);
+                this.__wrapper.addEventListener(_type, _callback, false);
 
                 return lid;
             },
 
             remove_event: function (_lid) {
                 var data = this.__listeners[_lid];
-                this._wrapper.removeEventListener(data.type, data.callback);
+                this.__wrapper.removeEventListener(data.type, data.callback);
                 delete this.__listeners[_lid];
             },
 
             value: function () {
-                return this._wrapper.value;
+                return this.__wrapper.value;
             },
 
             inner_text: function(_text){
-                this._wrapper.innerText = _text;
+                this.__wrapper.innerText = _text;
             }
         });
 

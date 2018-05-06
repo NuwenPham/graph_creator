@@ -12,6 +12,13 @@ var tokens = basic.inherit({
 
         this.__ward = options.ward;
 
+        if(!global.ward.db().data().token){
+            global.ward.db().data().token = {
+                tokens: {},
+                uid_on_token: {}
+            };
+        }
+        this.__token = global.ward.db().data().token;
         //this.__init();
     },
 
@@ -21,44 +28,37 @@ var tokens = basic.inherit({
     
     create_token: function (_user_id, _expire_time) {
         var expire_time = _expire_time || (1000 * 60 * 60 * 24);
+
         var token_id = MD5((+new Date + parseInt(_user_id)).toString());
-        ward.level().set(make_key(token_id), {
+        this.__token.tokens[token_id] = {
             user_id: _user_id,
             expire: +new Date + expire_time
-        });
+        };
+        this.__token.uid_on_token[_user_id] = token_id;
+
         return token_id;
     },
-    
+
     get_token: function (_token_id) {
-        var pr = new promise();
-        ward.level().get(make_key(_token_id)).then(function (_data) {
-            pr.resolve(_data);
-        }.bind(this), function () {
-            pr.reject();
-        }.bind(this));
-        return pr.native;
+        return this.__token.tokens[_token_id];
     },
-    
+
     check_token: function (_token_id) {
-        var pr = new promise();
-        this.get_token(_token_id).then(function (_data) {
-            if(_data.expire > +new Date){
-                pr.resolve(_data);
-            } else {
-                pr.reject();
-            }
-        }.bind(this), function () {
-            pr.reject();
-        }.bind(this));
-        return pr.native;
+        return this.__token.tokens[_token_id] != undefined;
     },
-    
+
     remove_token: function (_token_id) {
-        
+        var uid = this.__token.tokens[_token_id].user_id;
+        delete this.__token.uid_on_token[uid];
+        delete this.__token.tokens[_token_id];
     },
 
-    refresh_token: function(_token_id){
-
+    refresh_token: function(_token_id, _expire_time){
+        var expire_time = _expire_time || (1000 * 60 * 60 * 24);
+        this.__token.tokens[_token_id].expire_time = +new Date + expire_time;
+    },
+    get_token_by_uid: function (_uid) {
+        return this.__token.uid_on_token[_uid];
     }
 });
 

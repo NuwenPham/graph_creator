@@ -9,6 +9,64 @@ var user = {
         var token_id = _data.event.token_id;
         var error_reason = "";
         var error_id = "";
+
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+            var uid = t.user_id;
+            var user = ward.users().get_user_by_id(uid);
+            var char_out = [];
+
+            if(!user.data){
+                ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                    client_id: _data.client_id,
+                    success: false,
+                    //characters: char_out,
+                    command_addr: ["response_characters"]
+                });
+                return;
+            }
+
+            var char_list = user.data.eve_data.characters;
+            for (var k in char_list) {
+                if (!char_list.hasOwnProperty(k)) return;
+                var char_data = char_list[k];
+                char_out.push({
+                    id: k,
+                    char_name: char_data.char_name,
+                    images: char_data.images
+                });
+            }
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                success: true,
+                characters: char_out,
+                command_addr: ["response_characters"]
+            });
+        }
+    },
+    remove_character: function (_data) {
+        var token_id = _data.event.token_id;
+        var char_id = _data.event.char_id;
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+            var uid = t.user_id;
+            var user = ward.users().get_user_by_id(uid);
+            var char_list = user.data.eve_data.characters;
+            delete char_list[char_id];
+            ward.db().save();
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                success: true,
+                command_addr: ["response_remove_character"]
+            });
+        }
+    }
+
+
+    /*characters: function (_data) {
+        var token_id = _data.event.token_id;
+        var error_reason = "";
+        var error_id = "";
         ward.tokens().check_token(token_id).then(function (_tdata) {
             var user_id = _tdata.user_id;
 
@@ -50,7 +108,7 @@ var user = {
             });
             // failed on get user data
         }.bind(this));
-    }
+    }*/
 };
 
 var request_ccp_auth = function (_code) {
@@ -139,7 +197,8 @@ var request_user_data = function (_access_token) {
 
 module.exports = {
     requests: {
-        characters: user.characters
+        characters: user.characters,
+        remove_character: user.remove_character
     }
 };
 

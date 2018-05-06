@@ -79,7 +79,8 @@
                         if (data.success) {
                             this._init();
                         } else {
-                            console.log("bad token");
+                            console.log("ccp_auth_page: bad token");
+                            debugger;
                             nav.open("reg");
                         }
                         break;
@@ -108,6 +109,7 @@
                 }
                 var result = res_arr.join("&");
                 var url = destination + result;
+                console.log("CCP_AUTH_URL " + url);
                 location.href = url;
             },
 

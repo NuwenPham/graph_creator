@@ -3,6 +3,7 @@ var _ward = require("./ward.js");
 
 global.promise = _promise;
 global.ward = new _ward();
+global.ward.__init();
 
 global._CLIENT_ID = "804ba189451a4b12af36a1f770d9a12d";
 global._SECRET_KEY = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";

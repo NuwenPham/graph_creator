@@ -46,47 +46,29 @@ var game = {
             return;
         }
 
-        ward.users().add_user(mail, {
-            pass: pass_1,
-            eve_data: {}
-        }).then(function (_uid) {
-            // if success added
-            var token = ward.tokens().create_token(_uid, 1000 * 60 * 60 * 24);
+        var uid = ward.users().add_user(mail, {
+            pass: pass_1
+        });
 
+        if(uid >= 0){
+            ward.db().save();
+            var token = ward.tokens().create_token(uid, 1000 * 60 * 60 * 24);
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
-                user_id : _uid,
+                user_id : uid,
                 token: token,
                 success: true,
                 command_addr: ["response_reg"]
             });
-        }.bind(this), function (_err) {
-            // if not added
-
-            if(_err == "already_exist"){
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    command_addr: ["response_reg"],
-                    success: false,
-                    text: _err,
-                    error_id: ERROR.ALREADY_EXIST
-                });
-                return;
-            }
-
-
+        } else {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 command_addr: ["response_reg"],
                 success: false,
-                origin_error_msg: _err,
-                text: "unknown error",
-                error_id: ERROR.UNKNOWN
+                text: "already_exist",
+                error_id: ERROR.ALREADY_EXIST
             });
-        }.bind(this)).then(function () {
-            // ??
-        }.bind(this));
-
+        }
     },
     auth: function (_data) {
         var mail = _data.event.mail;
@@ -103,69 +85,59 @@ var game = {
             return;
         }
 
-        ward.users().get_user_by_mail(mail).then(function (_event) {
-            if(_event.data.pass != pass){
-                // incorrect password
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    command_addr: ["response_auth"],
-                    success: false,
-                    text: "incorrect password",
-                    error_id: ERROR.PASSWORD_INCORRECT
-                });
-                return;
-            }
+        var user = ward.users().get_user_by_mail(mail);
 
-            ward.users().get_user_by_mail(mail).then(function (_user_data) {
-                var token = ward.tokens().create_token(_user_data.id, 1000 * 60 * 60 * 24);
-
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    success: true,
-                    user_id: _user_data.id,
-                    token: token,
-                    command_addr: ["response_auth"]
-                });
-
-            }.bind(this), function () {
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    command_addr: ["response_auth"],
-                    success: false,
-                    text: "user not exist",
-                    error_id: ERROR.USER_NOT_EXIST
-                });
-            }.bind(this));
-
-
-        }.bind(this), function (_err) {
+        if(!user){
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 command_addr: ["response_auth"],
                 success: false,
-                text: "user do not exist",
+                text: "user not exist",
                 error_id: ERROR.USER_NOT_EXIST
             });
-        }.bind(this));
+            return;
+        }
+
+
+        if(user.data.pass != pass){
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                command_addr: ["response_auth"],
+                success: false,
+                text: "incorrect password",
+                error_id: ERROR.PASSWORD_INCORRECT
+            });
+            return;
+        }
+
+        //var tid = ward.tokens().get_token_by_uid(user.index);
+        var token = ward.tokens().create_token(user.index, 1000 * 60 * 60 * 24);
+        ward.dispatcher().send(_data.connection_id, _data.server_id, {
+            client_id: _data.client_id,
+            success: true,
+            user_id: user.index,
+            token: token,
+            command_addr: ["response_auth"]
+        });
+
 
     },
 
     check_token: function (_data) {
         var token_id = _data.event.token_id;
-
-        ward.tokens().check_token(token_id).then(function () {
+        if (ward.tokens().check_token(token_id)) {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 success: true,
                 command_addr: ["response_check_token"]
             });
-        }.bind(this), function () {
+        } else {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 success: false,
                 command_addr: ["response_check_token"]
             });
-        }.bind(this));
+        }
     },
 
     ccp_auth: function (_data) {
@@ -177,68 +149,66 @@ var game = {
         var expires_in = -1;
         var refresh_token = "";
 
-        var user_id = -1;
-        var mail = "";
-        var error_reason = null;
-        var error_id = -1;
+        if (ward.tokens().check_token(token_id)) {
+            request_ccp_auth(code).then(function (_response_data) {
+                console.log("auth_part_1");
+                access_token = _response_data.access_token;
+                token_type = _response_data.token_type;
+                expires_in = _response_data.expires_in; // seconds ?? (not sure)
+                refresh_token = _response_data.refresh_token;
+                request_user_data(access_token).then(function (_user_data) {
+                    console.log("auth_part_2: data");
 
-        ward.tokens().check_token(token_id).then(function (_data) {
-            user_id = _data.user_id;
-            return ward.users().get_user_mail_by_id(user_id)
-        }.bind(this), function () {
-            // failed on check_token
-            error_reason = "user not exist";
-            error_id = ERROR.BAD_TOKEN;
-        }.bind(this)).then(function (_mail) {
-            mail = _mail;
-            return request_ccp_auth(code);
-        }.bind(this), function () {
-            // failed on get mail
-            error_reason = !error_reason && "failed on get mail";
-            error_id = ERROR.USER_NOT_EXIST;
-        }.bind(this)).then(function (_response_data) {
-            access_token = _response_data.access_token;
-            token_type = _response_data.token_type;
-            expires_in = _response_data.expires_in;
-            refresh_token = _response_data.refresh_token;
-            return request_user_data(access_token);
-        }.bind(this), function (_data) {
-            // failed on auth
-            error_reason = !error_reason && "failed on ccp auth (no response from ccp server)";
-            error_id = ERROR.CCP_AUTH_FAILED;
-        }.bind(this)).then(function (_user_data) {
-            return ward.users().attach_eve_account(mail, {
-                char_id: _user_data.CharacterID,
-                char_name: _user_data.CharacterName,
-                expires_on: _user_data.ExpiresOn,
-                scopes: _user_data.Scopes,
-                character_owner_hash: _user_data.CharacterOwnerHash,
-                access_token: access_token,
-                token_type: _user_data.TokenType,
-                refresh_token: refresh_token,
-            });
-        }.bind(this), function () {
-            // failed on request user data
-            error_reason = !error_reason && "failed on request user data";
-            error_id = ERROR.CCP_DATA_FAILED;
-        }.bind(this)).then(function () {
-            ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                client_id: _data.client_id,
-                success: true,
-                command_addr: ["response_ccp_auth"]
-            });
-        }.bind(this), function () {
-            // failed on attach account
-            error_reason = !error_reason && "failed on attach account";
-            error_id = ERROR.ATTACH_FAILED;
+                    __request_char_portrait(access_token, _user_data.CharacterID).then(function (_images) {
+                        console.log("auth_part_3: portrait");
+                        var user_id = ward.tokens().get_token(token_id).user_id;
+                        var mail = ward.users().get_user_string_id_by_index(user_id);
+                        ward.users().attach_eve_account(mail, {
+                            char_id: _user_data.CharacterID,
+                            char_name: _user_data.CharacterName,
+                            expires_on: _user_data.ExpiresOn,
+                            expires_in: expires_in,
+                            scopes: _user_data.Scopes,
+                            character_owner_hash: _user_data.CharacterOwnerHash,
+                            access_token: access_token,
+                            token_type: _user_data.TokenType,
+                            images: _images,
+                            refresh_token: refresh_token,
+                        });
+
+                        ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                            client_id: _data.client_id,
+                            success: true,
+                            command_addr: ["response_ccp_auth"]
+                        });
+
+                        ward.db().save();
+                    });
+
+
+
+
+
+
+                }.bind(this), function () {
+                    send_error(_data, "failed on request user data", ERROR.CCP_DATA_FAILED);
+                }.bind(this));
+            }.bind(this), function () {
+                send_error(_data, "failed on ccp auth (no response from ccp server)", ERROR.CCP_AUTH_FAILED);
+            }.bind(this));
+        } else {
+            send_error(_data, "user not exist", ERROR.BAD_TOKEN);
+        }
+
+        var send_error = function (_data, _error_reason, _error_id) {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 success: false,
-                reason: error_reason,
-                error_id: error_id,
+                reason: _error_reason,
+                error_id: _error_id,
                 command_addr: ["response_ccp_auth"]
             });
-        }.bind(this));
+        }
 
     }
 };
@@ -306,10 +276,48 @@ module.exports = {
         reg: game.reg,
         auth: game.auth,
         check_token: game.check_token,
-        user_chars: game.user_chars,
         ccp_auth: game.ccp_auth
     }
 };
+
+
+var _esi_request = function (_access_token, _path, _options) {
+    var p = new promise();
+
+    var host = "https://esi.tech.ccp.is/";
+    var addr = host + _path + "?datasource=tranquility";
+
+    console.log("\n%s", addr);
+    var options = {
+        url: addr,
+        headers: {
+            Authorization: "Bearer " + _access_token,
+            "Content-Type": "application/json"
+        },
+        form: _options || {}
+    };
+
+    request.get(options, function (error, response, body) {
+        if (!error) {
+            console.log("ESI RESPONSE");
+            console.log(body);
+            console.log("");
+            p.resolve(JSON.parse(body));
+        } else {
+            p.reject(error);
+        }
+    }.bind(this));
+
+    return p.native;
+};
+
+var __request_char_portrait = function (_access_token, _char_id) {
+    var path = "latest/characters/" + _char_id + "/portrait/";
+    return _esi_request(_access_token, path);
+};
+
+
+
 
 var ERROR = {
     CHAR_ERROR: "CHAR_ERROR",

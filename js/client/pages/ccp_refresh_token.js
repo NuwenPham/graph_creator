@@ -27,7 +27,7 @@
             destructor: function () {
             },
 
-            _init: function () {
+            _after_init: function () {
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
                 dispatcher.send(this._client_id, {
                     command_addr: ["api", "ccp", "character", "location", "current"],
@@ -41,9 +41,9 @@
                 switch (command) {
                     case "response_check_token":
                         if (data.success) {
-                            this._init();
+                            this._after_init();
                         } else {
-                            console.log("bad token");
+                            console.log("ccp_refresh_token: bad token");
                             nav.open("reg");
                         }
                         break;

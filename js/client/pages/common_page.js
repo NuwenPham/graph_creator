@@ -8,20 +8,21 @@
     var name = "js/client/pages/common_page";
     var libs = [
         "js/client/pages/page",
-        "js/client/ui/button",
         "js/client/ui/lay",
-        "js/client/ui/overlaying",
-        "js/client/modules/characters"
+        "js/client/ui/list/list",
+        "js/client/ui/list/row",
+        "js/client/ui/button"
     ];
 
-    load_css("css/customs.css");
+    load_css("css/pages/common_page.css");
 
     define(name, libs, function () {
         var page = require("js/client/pages/page");
-        var button = require("js/client/ui/button");
         var lay = require("js/client/ui/lay");
-        var overlaying = require("js/client/ui/overlaying");
-        var characters = require("js/client/modules/characters");
+        var list = require("js/client/ui/list/list");
+        var row = require("js/client/ui/list/row");
+
+        var button = require("js/client/ui/button");
 
 
         var common_page = page.inherit({
@@ -34,76 +35,60 @@
             },
 
             destructor: function () {
+                page.prototype.destructor.call(this);
             },
 
-            _init: function () {
+            _after_init: function () {
+                page.prototype._after_init.call(this);
 
-                this._init_root();
-                this._init_header();
-                this._init_content();
+                this.__init_content();
+                this.__init_buttons();
+
                 this.refresh();
             },
+            __init_content: function () {
+                this.add_class("centered-outer fs");
 
-            _init_root: function () {
-                this.__root = new lay();
-                this.add_child(this.__root);
-                this.append(this.__root);
-                this.__root.add_class("root");
-                this.__root.remove_class("ui-lay");
+                this.__content = new lay();
+                this.__content.add_class("ui-common-page-content");
+                this.__content.add_class("centered-inner");
+
+                this.append(this.__content);
             },
+            __init_menu: function () {
+                this.__list = new list();
+                this.__content.append(this.__list);
 
-            _init_header: function () {
-                this.__header = new lay();
-                this.__root.add_child(this.__header);
-                this.__root.append(this.__header);
-                this.__header.add_class("cp-header");
-                this.__header.remove_class("ui-lay");
+                var row1 = new row();
+                var row2 = new row();
+                var row3 = new row();
+
+                this.__list.add(row1);
+                this.__list.add(row2);
+                this.__list.add(row3);
             },
+            __init_buttons: function () {
+                this.__btn_chars = new button({
+                    text: "chars"
+                });
+                this.__content.append(this.__btn_chars);
+                this.__btn_chars.css({
+                    width: "100%"
+                });
+                this.__btn_chars.add_event("click", function () {
+                    nav.open("chars_list");
+                });
 
-            _init_content: function () {
-                //this.__content = new lay();
-                //this.__root.add_child(this.__content);
-                //this.__root.append(this.__content);
-                //this.__content.add_class("cp-content");
-                //this.__content.remove_class("ui-lay");
-
-                this._init_map();
-                this._init_map_info();
-                this._init_sigs();
-
-
-                //debugger;
-                var ol = new characters();
-                this.add_child(ol);
-                this.append(ol);
-                //
-                //setTimeout(function () {
-                //    this.remove_child(ol);
-                //    this.remove(ol);
-                //    ol.destructor();
-                //}.bind(this), 2000);
-
-
-            },
-
-            _init_map: function () {
-                this.__map = new lay();
-                this.__root.add_child(this.__map);
-                this.__root.append(this.__map);
-                this.__map.add_class("cp-map");
-                this.__map.remove_class("ui-lay");
-            },
-
-            _init_map_info: function () {
-                this.__map_info = new lay();
-                this.__root.add_child(this.__map_info);
-                this.__root.append(this.__map_info);
-                this.__map_info.add_class("cp-map-info");
-                this.__map_info.remove_class("ui-lay");
-            },
-
-            _init_sigs: function () {
-
+                this.__btn_maps = new button({
+                    text: "maps"
+                });
+                this.__content.append(this.__btn_maps);
+                this.__btn_maps.css({
+                    width: "100%"
+                });
+                this.__btn_maps.add_event("click", function () {
+                    nav.open("map_list");
+                });
             }
         });
 

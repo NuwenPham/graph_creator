@@ -3,7 +3,8 @@ var dispatcher = require("./utils/dispatcher.js");
 var connection_manager = require("./managers/connection_manager.js");
 var user_manager = require("./managers/user_manager.js");
 var token_manager = require("./managers/token_manager.js");
-var leveldb = require("./utils/leveldb.js");
+var data_manager = require("./managers/data_manager.js");
+//var leveldb = require("./utils/leveldb.js");
 
 var games = {};
 global.games = games;
@@ -26,7 +27,7 @@ var ward = basic.inherit({
         var options = {};
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
-        this.__init();
+        //this.init();
     },
 
     destructor: function () {
@@ -34,17 +35,24 @@ var ward = basic.inherit({
     },
 
     __init: function () {
-        this.__init_db();
+        this.__init_data();
         this.__init_token_manager();
-        this.__init_dispatcher();
         this.__init_users();
-        this.__users.ready_promise().then(function () {
-            this.__init_connection_manager();
-            console.log("platform started");
-        }.bind(this), function () {
-            // failed
-            console.log("failed on starting users")
-        }.bind(this));
+        this.__init_connection_manager();
+        this.__init_dispatcher();
+
+        //this.__init_users();
+        //this.__users.ready_promise().then(function () {
+        //    this.__init_connection_manager();
+        //    console.log("platform started");
+        //}.bind(this), function () {
+        //    // failed
+        //    console.log("failed on starting users")
+        //}.bind(this));
+    },
+
+    __init_data: function () {
+        this.__data_manager = new data_manager();
     },
 
     __init_dispatcher: function () {
@@ -58,9 +66,6 @@ var ward = basic.inherit({
         this.__token_manager = new token_manager();
     },
 
-    __init_db: function () {
-        this.__db = new leveldb();
-    },
 
     __init_users: function () {
         this.__users = new user_manager({
@@ -76,16 +81,16 @@ var ward = basic.inherit({
         return this.__connection_manager;
     },
 
-    level : function () {
-        return this.__db;
-    },
-
     users: function(){
         return this.__users;
     },
 
     tokens: function(){
         return this.__token_manager;
+    },
+
+    db: function () {
+        return this.__data_manager;
     }
 
 });
