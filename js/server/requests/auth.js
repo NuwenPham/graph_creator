@@ -51,7 +51,7 @@ var game = {
         });
 
         if(uid >= 0){
-            ward.db().save();
+            ward.save();
             var token = ward.tokens().create_token(uid, 1000 * 60 * 60 * 24);
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
@@ -182,7 +182,7 @@ var game = {
                             command_addr: ["response_ccp_auth"]
                         });
 
-                        ward.db().save();
+                        ward.save();
                     });
 
 

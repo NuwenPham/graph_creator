@@ -9,17 +9,9 @@ var tokens = basic.inherit({
         var options = {};
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
-
+        this.__tokens = {};
+        this.__uid_on_token = {}
         this.__ward = options.ward;
-
-        if(!global.ward.db().data().token){
-            global.ward.db().data().token = {
-                tokens: {},
-                uid_on_token: {}
-            };
-        }
-        this.__token = global.ward.db().data().token;
-        //this.__init();
     },
 
     destructor: function () {
@@ -30,35 +22,48 @@ var tokens = basic.inherit({
         var expire_time = _expire_time || (1000 * 60 * 60 * 24);
 
         var token_id = MD5((+new Date + parseInt(_user_id)).toString());
-        this.__token.tokens[token_id] = {
+        this.__tokens[token_id] = {
             user_id: _user_id,
             expire: +new Date + expire_time
         };
-        this.__token.uid_on_token[_user_id] = token_id;
+        this.__uid_on_token[_user_id] = token_id;
 
+        ward.save();
         return token_id;
     },
 
     get_token: function (_token_id) {
-        return this.__token.tokens[_token_id];
+        return this.__tokens[_token_id];
     },
 
     check_token: function (_token_id) {
-        return this.__token.tokens[_token_id] != undefined;
+        return this.__tokens[_token_id] != undefined;
     },
 
     remove_token: function (_token_id) {
-        var uid = this.__token.tokens[_token_id].user_id;
-        delete this.__token.uid_on_token[uid];
-        delete this.__token.tokens[_token_id];
+        var uid = this.__tokens[_token_id].user_id;
+        delete this.__uid_on_token[uid];
+        delete this.__tokens[_token_id];
     },
 
     refresh_token: function(_token_id, _expire_time){
         var expire_time = _expire_time || (1000 * 60 * 60 * 24);
-        this.__token.tokens[_token_id].expire_time = +new Date + expire_time;
+        this.__tokens[_token_id].expire_time = +new Date + expire_time;
     },
     get_token_by_uid: function (_uid) {
-        return this.__token.uid_on_token[_uid];
+        return this.__uid_on_token[_uid];
+    },
+    save: function () {
+        return {
+            tokens: this.__tokens,
+            uid_on_token: this.__uid_on_token
+        }
+    },
+    restore: function (_data) {
+        if(_data){
+            this.__tokens = _data.tokens;
+            this.__uid_on_token = _data.uid_on_token;
+        }
     }
 });
 

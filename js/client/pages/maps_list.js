@@ -13,7 +13,7 @@
         "js/client/ui/list/row",
         "js/client/ui/list/char/row",
         "js/client/ui/button",
-        "js/client/requests/api/user/characters"
+        "js/client/requests/api/user/maps"
     ];
 
     load_css("css/pages/chars_list.css");
@@ -25,11 +25,11 @@
         var row = require("js/client/ui/list/row");
 
         var button = require("js/client/ui/button");
-        var request_characters = require("js/client/requests/api/user/characters");
+        var request_map_list = require("js/client/requests/api/mapper/list");
+        var request_add_map = require("js/client/requests/api/mapper/add");
+        var request_remove_map = require("js/client/requests/api/mapper/remove");
+
         var char_row = require("js/client/ui/list/char/row");
-
-
-
 
         var chars_list = page.inherit({
             constructor: function chars_list(_options) {
@@ -51,7 +51,7 @@
                 this.__init_menu();
                 this.__init_bottom();
 
-                this.request_chars();
+                this.request_map_list();
                 this.refresh();
             },
             __init_content: function () {
@@ -78,14 +78,6 @@
             __init_menu: function () {
                 this.__list = new list();
                 this.__content.append(this.__list);
-
-                //var row1 = new row();
-                //var row2 = new row();
-                //var row3 = new row();
-                //
-                //this.__list.add(row1);
-                //this.__list.add(row2);
-                //this.__list.add(row3);
             },
             __init_bottom: function () {
                 this.__panel = new lay();
@@ -123,47 +115,45 @@
                 });
             },
             __on_add_click: function () {
-                nav.open("ccp_auth_page", {
-                    from: "chars_list"
-                });
+
             },
             __on_back_click: function () {
                 nav.open("common_page", {
                     from: "chars_list"
                 });
             },
-            __on_response_chars: function (_event) {
+            __on_response_maps: function (_event) {
                 if(_event.data.success){
                     var a = 0;
-                    while( a < _event.data.characters.length ){
-                        var char = _event.data.characters[a];
-
-                        var rw = new char_row({
-                            char_name: char.char_name,
-                            char_id: char.id,
-                            image: char.images.px64x64
-                        });
-                        this.__list.add(rw);
-
-                        rw.on("del", function(_rw){
-                            this.__list.del(_rw);
-                        }.bind(this, rw));
-                        a++;
-                    }
+                    //while( a < _event.data.characters.length ){
+                    //    var char = _event.data.characters[a];
+                    //
+                    //    var rw = new char_row({
+                    //        char_name: char.char_name,
+                    //        char_id: char.id,
+                    //        image: char.images.px64x64
+                    //    });
+                    //    this.__list.add(rw);
+                    //
+                    //    rw.on("del", function(_rw){
+                    //        this.__list.del(_rw);
+                    //    }.bind(this, rw));
+                    //    a++;
+                    //}
                 } else {
 
                 }
             },
-            request_chars: function () {
+            request_map_list: function () {
                 var token_id = sessionStorage.getItem("token");
-                var rc = new request_characters({
+                var rc = new request_map_list({
                     token_id: token_id
                 });
-                rc.on("response", this.__on_response_chars.bind(this));
+                rc.on("response", this.__on_response_maps.bind(this));
                 rc.request();
             }
         });
 
         return chars_list;
-    })
+    });
 })(window);

@@ -2,6 +2,7 @@ var basic = require("./basic");
 var dispatcher = require("./utils/dispatcher.js");
 var connection_manager = require("./managers/connection_manager.js");
 var user_manager = require("./managers/user_manager.js");
+var map_manager = require("./managers/map_manager.js");
 var token_manager = require("./managers/token_manager.js");
 var data_manager = require("./managers/data_manager.js");
 //var leveldb = require("./utils/leveldb.js");
@@ -38,6 +39,7 @@ var ward = basic.inherit({
         this.__init_data();
         this.__init_token_manager();
         this.__init_users();
+        this.__init_maps();
         this.__init_connection_manager();
         this.__init_dispatcher();
 
@@ -49,6 +51,7 @@ var ward = basic.inherit({
         //    // failed
         //    console.log("failed on starting users")
         //}.bind(this));
+        this.restore();
     },
 
     __init_data: function () {
@@ -73,6 +76,12 @@ var ward = basic.inherit({
         });
     },
 
+    __init_maps: function () {
+        this.__maps = new map_manager({
+            ward: this
+        });
+    },
+
     dispatcher: function () {
         return this.__dispatcher;
     },
@@ -89,8 +98,25 @@ var ward = basic.inherit({
         return this.__token_manager;
     },
 
+    maps: function(){
+        return this.__maps;
+    },
+
     db: function () {
         return this.__data_manager;
+    },
+    save: function(){
+        var data = this.__data_manager.data();
+        data.token = this.__token_manager.save();
+        data.user_data = this.__users.save();
+        data.map_manager = this.__maps.save();
+        this.__data_manager.save();
+    },
+    restore: function () {
+        var data = this.__data_manager.data();
+        this.__token_manager.restore(data.token);
+        this.__users.restore(data.user_data);
+        this.__maps.restore(data.map_manager);
     }
 
 });

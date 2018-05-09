@@ -10,17 +10,9 @@ var users = basic.inherit({
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
 
-        this.__ward = options.ward;
-
-        if(!global.ward.db().data().user_data) {
-            global.ward.db().data().user_data = {
-                users: {},
-                index_on_id: {},
-                count: 0
-            };
-        }
-
-        this.__user_data = global.ward.db().data().user_data;
+        this.__users = {};
+        this.__index_on_id = {};
+        this.__count = 0;
 
         this.__init();
     },
@@ -37,53 +29,53 @@ var users = basic.inherit({
     },
 
     add_user: function (_string_id, _data) {
-        if (this.__user_data.users[_string_id]) {
+        if (this.__users[_string_id]) {
             return -1;
         }
 
-        var id = this.__user_data.count++;
-        this.__user_data.users[_string_id] = {
+        var id = this.__count++;
+        this.__users[_string_id] = {
             index: id,
             data: _data
         };
-        this.__user_data.index_on_id[id] = _string_id;
+        this.__index_on_id[id] = _string_id;
         return id;
     },
 
     remove_user: function (_string_id) {
-        if (!this.__user_data.users[_string_id]) {
+        if (!this.__users[_string_id]) {
             return false;
         }
 
-        var index = this.__user_data.users[_string_id].index;
-        delete this.__user_data.users[_string_id];
-        delete this.__user_data.index_on_id[index];
+        var index = this.__users[_string_id].index;
+        delete this.__users[_string_id];
+        delete this.__index_on_id[index];
     },
 
     get_user_string_id_by_index: function (_index) {
-        if(!this.__user_data.index_on_id[_index] ) {
+        if (!this.__index_on_id[_index]) {
             return false;
         }
-        return this.__user_data.index_on_id[_index];
+        return this.__index_on_id[_index];
     },
 
     get_user_by_id: function (_user_id) {
-        var str_id = this.__user_data.index_on_id[_user_id];
-        if(!str_id){
+        var str_id = this.__index_on_id[_user_id];
+        if (!str_id) {
             return false;
         }
-        return this.__user_data.users[str_id];
+        return this.__users[str_id];
     },
 
     get_user_by_mail: function (_string_id) {
-        if(!this.__user_data.users[_string_id]){
+        if (!this.__users[_string_id]) {
             return false;
         }
-        return this.__user_data.users[_string_id];
+        return this.__users[_string_id];
     },
 
     attach_eve_account: function (_string_id, _character_data) {
-        var user = this.__user_data.users[_string_id];
+        var user = this.__users[_string_id];
         if (!user) {
             return false;
         }
@@ -109,12 +101,12 @@ var users = basic.inherit({
     },
 
     update_character_data: function (_user_id, _character_id, _new_data) {
-        var string_id = this.__user_data.index_on_id[_user_id];
-        if(!string_id){
+        var string_id = this.__index_on_id[_user_id];
+        if (!string_id) {
             return false;
         }
 
-        var user = this.__user_data.users[string_id];
+        var user = this.__users[string_id];
         if (!user) {
             return false;
         }
@@ -122,21 +114,32 @@ var users = basic.inherit({
         var characters = user.data.eve_data.characters;
         var character = characters[_character_id];
 
-        for(var k in _new_data){
+        for (var k in _new_data) {
             character[k] = _new_data[k];
         }
 
         return true;
     },
-
     ready_promise: function () {
         return this.__ready_promise.native;
     },
-
     is_ready: function () {
         return this.__is_ready;
+    },
+    save: function () {
+        return {
+            users: this.__users,
+            index_on_id: this.__index_on_id,
+            count: this.__count
+        }
+    },
+    restore: function (_data) {
+        if (_data) {
+            this.__users = _data.users;
+            this.__index_on_id = _data.index_on_id;
+            this.__count = _data.count;
+        }
     }
-
 });
 
 
