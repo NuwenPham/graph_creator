@@ -10,7 +10,7 @@ var Maps = basic.inherit({
         basic.prototype.constructor.call(this, options);
 
         this.__maps = {};
-        this.__index_by_id = [];
+        this.__index_on_id = [];
         this.__count = 0;
         
         this.__init();
@@ -19,7 +19,7 @@ var Maps = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
-
+        this.start_poll();
     },
     add_map: function (_options) {
         var mid = this.__count++;
@@ -33,24 +33,24 @@ var Maps = basic.inherit({
         var map = new Map(base);
         this.__maps[mid] = map;
 
-        this.__index_by_id.push(mid);
+        this.__index_on_id.push(mid);
 
         ward.save();
 
         return mid;
     },
     remove_map: function (_mid) {
-        var index = this.__index_by_id.indexOf(_mid);
+        var index = this.__index_on_id.indexOf(_mid);
         delete this.__maps[_mid];
-        this.__index_by_id.splice(index, 1);
+        this.__index_on_id.splice(index, 1);
         ward.save();
     },
     map_list: function () {
         var list = [];
         var a = 0;
 
-        while(a < this.__index_by_id.length){
-            var mid = this.__index_by_id[a];
+        while(a < this.__index_on_id.length){
+            var mid = this.__index_on_id[a];
             var map = this.__maps[mid];
             list.push({
                 is_public: map.is_public(),
@@ -62,7 +62,27 @@ var Maps = basic.inherit({
         return list;
     },
     is_exist: function (_mid) {
-        return this.__index_by_id.indexOf(_mid) != -1;
+        return this.__index_on_id.indexOf(_mid) != -1;
+    },
+    start_poll: function () {
+        var a = 0;
+        while(a < this.__index_on_id.length){
+            var mid = this.__index_on_id[a];
+            var map = this.__maps[mid];
+            var users = map.users();
+
+            var b = 0;
+            while( b < users.length){
+                var uid = users[b];
+                var user = ward.users().get_user_by_id(uid);
+
+
+
+                b++;
+            }
+
+            a++;
+        }
     },
     save: function () {
         var maps_res = {};
@@ -71,11 +91,11 @@ var Maps = basic.inherit({
             maps_res[k] = map.save();
         }
 
-        var index_by_id = this.__index_by_id;
+        var index_on_id = this.__index_on_id;
 
         return {
             count: this.__count,
-            index_by_id: index_by_id,
+            index_on_id: index_on_id,
             maps: maps_res
         }
     },
@@ -94,7 +114,7 @@ var Maps = basic.inherit({
                     links: map_data.links
                 });
             }
-            this.__index_by_id = _data.index_by_id;
+            this.__index_on_id = _data.index_on_id;
             this.__count = _data.count;
         }
 
@@ -132,7 +152,6 @@ var Map = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
-
     },
     add_user: function () {
 
@@ -157,6 +176,9 @@ var Map = basic.inherit({
     },
     has_password: function () {
         return (typeof this.__data.password == "string" && this.__data.password.length > 0);
+    },
+    users: function () {
+        return this.__users;
     },
     save: function () {
         return {

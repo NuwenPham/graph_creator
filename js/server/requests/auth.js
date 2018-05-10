@@ -162,8 +162,10 @@ var game = {
                     __request_char_portrait(access_token, _user_data.CharacterID).then(function (_images) {
                         console.log("auth_part_3: portrait");
                         var user_id = ward.tokens().get_token(token_id).user_id;
-                        var mail = ward.users().get_user_string_id_by_index(user_id);
-                        ward.users().attach_eve_account(mail, {
+                        // var mail = ward.users().get_mail(user_id);
+
+                        var user = ward.users().get_user_by_id(user_id);
+                        user.add_eve_char({
                             char_id: _user_data.CharacterID,
                             char_name: _user_data.CharacterName,
                             expires_on: _user_data.ExpiresOn,
@@ -173,15 +175,13 @@ var game = {
                             access_token: access_token,
                             token_type: _user_data.TokenType,
                             images: _images,
-                            refresh_token: refresh_token,
+                            refresh_token: refresh_token
                         });
-
                         ward.dispatcher().send(_data.connection_id, _data.server_id, {
                             client_id: _data.client_id,
                             success: true,
                             command_addr: ["response_ccp_auth"]
                         });
-
                         ward.save();
                     });
 

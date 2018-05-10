@@ -11,120 +11,67 @@ var users = basic.inherit({
         basic.prototype.constructor.call(this, options);
 
         this.__users = {};
-        this.__index_on_id = {};
+        this.__index_on_id = [];
+        this.__mail_on_id = {};
         this.__count = 0;
 
         this.__init();
     },
-
     destructor: function () {
         basic.prototype.destructor.call(this);
     },
-
     __init: function () {
-        this.__id = 0;
-        this.__ready_promise = new promise();
-        this.__is_ready = true;
-        this.__ready_promise.resolve();
-    },
 
-    add_user: function (_string_id, _data) {
-        if (this.__users[_string_id]) {
+    },
+    add_user: function (_data) {
+        var base = {
+            mail: "",
+            password: ""
+        };
+        Object.extend(base, _data);
+
+        if (this.__mail_on_id[base.mail]) {
             return -1;
         }
+        var uid = this.__count++;
 
-        var id = this.__count++;
-        this.__users[_string_id] = {
-            index: id,
-            data: _data
-        };
-        this.__index_on_id[id] = _string_id;
-        return id;
+        this.__users[uid] = new User({
+            id: uid,
+            mail: base.mail,
+            password: base.password
+        });
+        this.__index_on_id.push(uid);
+        this.__mail_on_id[base.mail] = uid;
+        return uid;
     },
-
-    remove_user: function (_string_id) {
-        if (!this.__users[_string_id]) {
+    remove_user: function (_id) {
+        if (this.__index_on_id[_id] == -1) {
             return false;
         }
 
-        var index = this.__users[_string_id].index;
-        delete this.__users[_string_id];
-        delete this.__index_on_id[index];
-    },
+        var index = this.__index_on_id.indexOf(_id);
+        this.__index_on_id.splice(index, 1);
 
-    get_user_string_id_by_index: function (_index) {
-        if (!this.__index_on_id[_index]) {
-            return false;
-        }
-        return this.__index_on_id[_index];
-    },
+        var user = this.__users[_id];
+        var mail = user.mail();
 
-    get_user_by_id: function (_user_id) {
-        var str_id = this.__index_on_id[_user_id];
-        if (!str_id) {
-            return false;
-        }
-        return this.__users[str_id];
-    },
+        delete this.__mail_on_id[mail];
 
-    get_user_by_mail: function (_string_id) {
-        if (!this.__users[_string_id]) {
-            return false;
-        }
-        return this.__users[_string_id];
+        user.destructor();
+        delete this.__users[_id];
     },
-
-    attach_eve_account: function (_string_id, _character_data) {
-        var user = this.__users[_string_id];
+    get_user_by_id: function (_uid) {
+        var user = this.__users[_uid];
         if (!user) {
             return false;
         }
-
-        if (!user.data.eve_data) {
-            user.data.eve_data = {
-                characters: {}
-            };
-        }
-
-        user.data.eve_data.characters[_character_data.char_id] = {
-            char_name: _character_data.char_name,
-            expires_on: _character_data.expires_on,
-            scopes: _character_data.scopes,
-            character_owner_hash: _character_data.character_owner_hash,
-            access_token: _character_data.access_token,
-            token_type: _character_data.token_type,
-            images: _character_data.images,
-            refresh_token: _character_data.refresh_token
-        };
-
-        return true;
+        return user;
     },
-
-    update_character_data: function (_user_id, _character_id, _new_data) {
-        var string_id = this.__index_on_id[_user_id];
-        if (!string_id) {
+    get_user_by_mail: function (_mail) {
+        if (!this.__mail_on_id[_mail]) {
             return false;
         }
-
-        var user = this.__users[string_id];
-        if (!user) {
-            return false;
-        }
-
-        var characters = user.data.eve_data.characters;
-        var character = characters[_character_id];
-
-        for (var k in _new_data) {
-            character[k] = _new_data[k];
-        }
-
-        return true;
-    },
-    ready_promise: function () {
-        return this.__ready_promise.native;
-    },
-    is_ready: function () {
-        return this.__is_ready;
+        return this.get_user_by_id(this.__mail_on_id[_mail]);
     },
     save: function () {
         return {
@@ -143,12 +90,105 @@ var users = basic.inherit({
 });
 
 
+var User = basic.inherit({
+    constructor: function User(_options) {
+        var base = {
+            id: -1,
+            mail: "",
+            password: "",
+            characters: {}
+        };
+        Object.extend(base, _options);
+        basic.prototype.constructor.call(this, base);
+
+        this.__id = base.id;
+        this.__mail = base.mail;
+        this.__password = base.password;
+        this.__characters = base.characters;
+        
+        this.__init();
+    },
+    destructor: function () {
+        basic.prototype.destructor.call(this);
+    },
+    __init: function () {
+        
+    },
+    add_eve_char: function (_options) {
+        var base = {
+            char_name: "",
+            expires_on: "",
+            scopes: "",
+            character_owner_hash: "",
+            access_token: "",
+            token_type: "",
+            images: {},
+            refresh_token: ""
+        };
+        Object.extend(base, _options);
+
+        if(this.__characters[base.char_name]){
+            return false;
+        }
+
+        this.__characters[base.char_name] = new EVEChar({
+            char_name: base.char_name,
+            expires_on: base.expires_on,
+            scopes: base.scopes,
+            character_owner_hash: base.character_owner_hash,
+            access_token: base.access_token,
+            token_type: base.token_type,
+            images: base.images,
+            refresh_token: base.refresh_token
+        });
+
+        return true;
+    },
+    mail: function () {
+        return this.__mail;
+    },
+    password: function () {
+        return this.__password;
+    },
+    save: function () {
+        
+    },
+    restore: function () {
+        
+    }
+});
+
+var EVEChar = basic.inherit({
+    constructor: function EVEChar(_options) {
+        var base = {
+            id: -1,
+            char_name: "",
+            expires_on: "",
+            scopes: "",
+            character_owner_hash: "",
+            access_token: "",
+            token_type: "",
+            images: {},
+            refresh_token: ""
+        };
+        Object.extend(base, _options);
+        basic.prototype.constructor.call(this, base);
+
+        this.__id = base.id;
+        this.__init();
+    },
+    destructor: function () {
+        basic.prototype.destructor.call(this);
+    },
+    __init: function () {
+
+    },
+    save: function () {
+
+    }
+});
 
 
-var user_counter = "user_counter";
-var prefix = "users";
-var make_key = function (_key) {
-    return prefix + "_" + _key;
-};
+
 
 module.exports = users;
