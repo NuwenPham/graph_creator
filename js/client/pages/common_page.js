@@ -87,7 +87,7 @@
                     width: "100%"
                 });
                 this.__btn_maps.add_event("click", function () {
-                    nav.open("map_list");
+                    nav.open("maps_list");
                 });
             }
         });

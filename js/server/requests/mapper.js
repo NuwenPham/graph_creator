@@ -15,6 +15,17 @@ var mapper = {
             var t = ward.tokens().get_token(token_id);
             var uid = t.user_id;
 
+            if(!ward.maps().is_exist_by_name(name)){
+                ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                    client_id: _data.client_id,
+                    success: false,
+                    text: "map with such name already exist",
+                    error_id: ERROR.ALREADY_EXIST,
+                    command_addr: ["response_add"]
+                });
+                return;
+            }
+
             var mid = ward.maps().add_map({
                 name: name,
                 password: password,
@@ -24,15 +35,13 @@ var mapper = {
 
             ward.save();
 
-            if(!user.data){
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    mid: mid,
-                    success: true,
-                    command_addr: ["response_add"]
-                });
-                return;
-            }
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                mid: mid,
+                success: true,
+                command_addr: ["response_add"]
+            });
+
         }
     },
     remove: function (_data) {
@@ -41,7 +50,7 @@ var mapper = {
         if (ward.tokens().check_token(token_id)) {
             var t = ward.tokens().get_token(token_id);
             var uid = t.user_id;
-            ward.maps().remove_map(uid);
+            ward.maps().remove_map(mid);
             ward.save();
             if(!user.data){
                 ward.dispatcher().send(_data.connection_id, _data.server_id, {
@@ -54,6 +63,14 @@ var mapper = {
         }
 
     },
+    observe: function (_data) {
+        var token_id = _data.event.token_id;
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+            var uid = t.user_id;
+
+        }
+    },
     list: function (_data) {
         var token_id = _data.event.token_id;
         var error_reason = "";
@@ -64,6 +81,13 @@ var mapper = {
             var uid = t.user_id;
             var user = ward.users().get_user_by_id(uid);
 
+            var maps = ward.maps().map_list();
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                list : maps,
+                success: true,
+                command_addr: ["response_maps"]
+            });
         }
     },
     add_link: function (_data) {
@@ -175,14 +199,6 @@ module.exports = {
 
 var ERROR = {
     CHAR_ERROR: "CHAR_ERROR",
-    ATTACH_FAILED: "ATTACH_FAILED",
-    CCP_DATA_FAILED: "CCP_DATA_FAILED",
-    CCP_AUTH_FAILED: "CCP_AUTH_FAILED",
-    BAD_TOKEN: "BAD_TOKEN",
-    USER_NOT_EXIST: "USER_NOT_EXIST",
-    SHORTER_PASSWORD: "SHORTER_PASSWORD",
-    INVALID_MAIL: "INVALID_MAIL",
-    PASSWORDS_NOT_MATCH: "PASSWORDS_NOT_MATCH",
     PASSWORD_INCORRECT: "PASSWORD_INCORRECT",
     ALREADY_EXIST: "ALREADY_EXIST",
     UNKNOWN: "UNKNOWN"

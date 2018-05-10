@@ -11,6 +11,7 @@ var Maps = basic.inherit({
 
         this.__maps = {};
         this.__index_on_id = [];
+        this.__name_on_id = {};
         this.__count = 0;
         
         this.__init();
@@ -19,7 +20,7 @@ var Maps = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
-        this.start_poll();
+        //this.start_poll();
     },
     add_map: function (_options) {
         var mid = this.__count++;
@@ -27,6 +28,7 @@ var Maps = basic.inherit({
         var base = {
             id: mid,
             password: null,
+            name: "",
             is_public: true
         };
         Object.extend(base, _options);
@@ -34,6 +36,7 @@ var Maps = basic.inherit({
         this.__maps[mid] = map;
 
         this.__index_on_id.push(mid);
+        this.__name_on_id[base.name] = mid;
 
         ward.save();
 
@@ -54,6 +57,7 @@ var Maps = basic.inherit({
             var map = this.__maps[mid];
             list.push({
                 is_public: map.is_public(),
+                name: map.name(),
                 has_password: map.has_password(),
                 id: mid
             });
@@ -63,6 +67,9 @@ var Maps = basic.inherit({
     },
     is_exist: function (_mid) {
         return this.__index_on_id.indexOf(_mid) != -1;
+    },
+    is_exist_by_name: function (_name) {
+        return this.__name_on_id[_name] === undefined;
     },
     start_poll: function () {
         var a = 0;
@@ -95,6 +102,7 @@ var Maps = basic.inherit({
 
         return {
             count: this.__count,
+            name_on_id: this.__name_on_id,
             index_on_id: index_on_id,
             maps: maps_res
         }
@@ -115,6 +123,7 @@ var Maps = basic.inherit({
                 });
             }
             this.__index_on_id = _data.index_on_id;
+            this.__name_on_id = _data.name_on_id;
             this.__count = _data.count;
         }
 
@@ -172,10 +181,13 @@ var Map = basic.inherit({
 
     },
     is_public: function () {
-        return this.__data.is_public;
+        return this.__is_public;
+    },
+    name: function () {
+        return this.__name;
     },
     has_password: function () {
-        return (typeof this.__data.password == "string" && this.__data.password.length > 0);
+        return (typeof this.__password == "string" && this.__password.length > 0);
     },
     users: function () {
         return this.__users;

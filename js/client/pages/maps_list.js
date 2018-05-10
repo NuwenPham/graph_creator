@@ -5,18 +5,20 @@
  * Created by pham on 8/8/17.
  */
 (function (_export) {
-    var name = "js/client/pages/chars_list";
+    var name = "js/client/pages/maps_list";
     var libs = [
         "js/client/pages/page",
         "js/client/ui/lay",
         "js/client/ui/list/list",
         "js/client/ui/list/row",
-        "js/client/ui/list/char/row",
+        "js/client/ui/list/map/row",
         "js/client/ui/button",
-        "js/client/requests/api/user/maps"
+        "js/client/requests/api/mapper/list",
+        "js/client/requests/api/mapper/add",
+        "js/client/requests/api/mapper/remove"
     ];
 
-    load_css("css/pages/chars_list.css");
+    load_css("css/pages/map_list.css");
 
     define(name, libs, function () {
         var page = require("js/client/pages/page");
@@ -26,13 +28,13 @@
 
         var button = require("js/client/ui/button");
         var request_map_list = require("js/client/requests/api/mapper/list");
-        var request_add_map = require("js/client/requests/api/mapper/add");
-        var request_remove_map = require("js/client/requests/api/mapper/remove");
+        //var request_add_map = require("js/client/requests/api/mapper/add");
+        //var request_remove_map = require("js/client/requests/api/mapper/remove");
 
-        var char_row = require("js/client/ui/list/char/row");
+        var map_row = require("js/client/ui/list/map/row");
 
-        var chars_list = page.inherit({
-            constructor: function chars_list(_options) {
+        var maps_list = page.inherit({
+            constructor: function maps_list(_options) {
                 var options = {
 
                 };
@@ -115,7 +117,9 @@
                 });
             },
             __on_add_click: function () {
-
+                nav.open("add_map",{
+                    from: "chars_list"
+                });
             },
             __on_back_click: function () {
                 nav.open("common_page", {
@@ -125,21 +129,20 @@
             __on_response_maps: function (_event) {
                 if(_event.data.success){
                     var a = 0;
-                    //while( a < _event.data.characters.length ){
-                    //    var char = _event.data.characters[a];
-                    //
-                    //    var rw = new char_row({
-                    //        char_name: char.char_name,
-                    //        char_id: char.id,
-                    //        image: char.images.px64x64
-                    //    });
-                    //    this.__list.add(rw);
-                    //
-                    //    rw.on("del", function(_rw){
-                    //        this.__list.del(_rw);
-                    //    }.bind(this, rw));
-                    //    a++;
-                    //}
+                    while( a < _event.data.list.length ){
+                        var char = _event.data.list[a];
+
+                        var rw = new map_row({
+                            map_name: char.name,
+                            map_id: char.id
+                        });
+                        this.__list.add(rw);
+
+                        rw.on("del", function(_rw){
+                            this.__list.del(_rw);
+                        }.bind(this, rw));
+                        a++;
+                    }
                 } else {
 
                 }
@@ -154,6 +157,6 @@
             }
         });
 
-        return chars_list;
+        return maps_list;
     });
 })(window);

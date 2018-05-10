@@ -10,6 +10,8 @@
         "js/client/pages/ccp_auth_response",
         "js/client/pages/ccp_refresh_token",
         "js/client/pages/chars_list",
+        "js/client/pages/maps_list",
+        "js/client/pages/add_map",
         "js/client/pages/common_page"
     ];
     define(name, libs, function () {

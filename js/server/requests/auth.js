@@ -46,8 +46,9 @@ var game = {
             return;
         }
 
-        var uid = ward.users().add_user(mail, {
-            pass: pass_1
+        var uid = ward.users().add_user({
+            mail: mail,
+            password: pass_1
         });
 
         if(uid >= 0){
@@ -99,7 +100,7 @@ var game = {
         }
 
 
-        if(user.data.pass != pass){
+        if(user.password() != pass){
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 command_addr: ["response_auth"],
@@ -111,11 +112,11 @@ var game = {
         }
 
         //var tid = ward.tokens().get_token_by_uid(user.index);
-        var token = ward.tokens().create_token(user.index, 1000 * 60 * 60 * 24);
+        var token = ward.tokens().create_token(user.id(), 1000 * 60 * 60 * 24);
         ward.dispatcher().send(_data.connection_id, _data.server_id, {
             client_id: _data.client_id,
             success: true,
-            user_id: user.index,
+            user_id: user.id(),
             token: token,
             command_addr: ["response_auth"]
         });
@@ -150,20 +151,19 @@ var game = {
         var refresh_token = "";
 
         if (ward.tokens().check_token(token_id)) {
+            console.log("auth_part_0: inner token success");
             request_ccp_auth(code).then(function (_response_data) {
-                console.log("auth_part_1");
+                console.log("auth_part_1: ccp auth success");
                 access_token = _response_data.access_token;
                 token_type = _response_data.token_type;
                 expires_in = _response_data.expires_in; // seconds ?? (not sure)
                 refresh_token = _response_data.refresh_token;
                 request_user_data(access_token).then(function (_user_data) {
-                    console.log("auth_part_2: data");
+                    console.log("auth_part_2: char data success");
 
                     __request_char_portrait(access_token, _user_data.CharacterID).then(function (_images) {
                         console.log("auth_part_3: portrait");
                         var user_id = ward.tokens().get_token(token_id).user_id;
-                        // var mail = ward.users().get_mail(user_id);
-
                         var user = ward.users().get_user_by_id(user_id);
                         user.add_eve_char({
                             char_id: _user_data.CharacterID,
@@ -184,11 +184,6 @@ var game = {
                         });
                         ward.save();
                     });
-
-
-
-
-
 
                 }.bind(this), function () {
                     send_error(_data, "failed on request user data", ERROR.CCP_DATA_FAILED);

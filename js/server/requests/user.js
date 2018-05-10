@@ -13,27 +13,17 @@ var user = {
         if (ward.tokens().check_token(token_id)) {
             var t = ward.tokens().get_token(token_id);
             var uid = t.user_id;
-            var user = ward.users().get_user_by_id(uid);
+            var u = ward.users().get_user_by_id(uid);
             var char_out = [];
 
-            if(!user.data|| !user.data.eve_data){
-                ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                    client_id: _data.client_id,
-                    success: false,
-                    //characters: char_out,
-                    command_addr: ["response_characters"]
-                });
-                return;
-            }
-
-            var char_list = user.data.eve_data.characters;
+            var char_list = u.characters();
             for (var k in char_list) {
                 if (!char_list.hasOwnProperty(k)) return;
                 var char_data = char_list[k];
                 char_out.push({
                     id: k,
-                    char_name: char_data.char_name,
-                    images: char_data.images
+                    char_name: char_data.char_name(),
+                    images: char_data.images()
                 });
             }
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
@@ -50,9 +40,9 @@ var user = {
         if (ward.tokens().check_token(token_id)) {
             var t = ward.tokens().get_token(token_id);
             var uid = t.user_id;
-            var user = ward.users().get_user_by_id(uid);
-            var char_list = user.data.eve_data.characters;
-            delete char_list[char_id];
+            var u = ward.users().get_user_by_id(uid);
+
+            u.remove_eve_char(char_id);
             ward.save();
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
@@ -61,54 +51,6 @@ var user = {
             });
         }
     }
-
-
-    /*characters: function (_data) {
-        var token_id = _data.event.token_id;
-        var error_reason = "";
-        var error_id = "";
-        ward.tokens().check_token(token_id).then(function (_tdata) {
-            var user_id = _tdata.user_id;
-
-            return ward.users().get_user_by_id(user_id);
-        }.bind(this), function () {
-            error_reason = ERROR.BAD_TOKEN;
-            error_id = ERROR.BAD_TOKEN;
-        }.bind(this)).then(function (_user_data) {
-            //user_data.eve_accounts
-
-            var chars = [];
-            for(var k in _user_data.data.eve_accounts) {
-                if(!_user_data.data.eve_accounts.hasOwnProperty(k)) return;
-
-                var char_data = _user_data.data.eve_accounts[k];
-                chars.push({
-                    id: k,
-                    char_name: char_data.char_name
-                });
-            }
-
-            ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                client_id: _data.client_id,
-                success: true,
-                chars: chars,
-                command_addr: ["response_characters"]
-            });
-        }.bind(this), function (_reason) {
-            error_reason = ERROR.CHAR_ERROR;
-            error_id = ERROR.CHAR_ERROR;
-            //debugger;
-
-            ward.dispatcher().send(_data.connection_id, _data.server_id, {
-                client_id: _data.client_id,
-                success: false,
-                reason: error_reason + ": " + _reason,
-                error_id: error_id,
-                command_addr: ["response_characters"]
-            });
-            // failed on get user data
-        }.bind(this));
-    }*/
 };
 
 var request_ccp_auth = function (_code) {
