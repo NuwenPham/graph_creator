@@ -8,7 +8,8 @@
         "js/client/ui/button",
         "js/client/ui/list/row",
 
-        "js/client/requests/api/mapper/remove"
+        "js/client/requests/api/mapper/remove",
+        "js/client/requests/api/mapper/observe"
     ];
 
     load_css("css/list/map/row.css");
@@ -19,6 +20,7 @@
         var button = require("js/client/ui/button");
 
         var request_remove_character = require("js/client/requests/api/mapper/remove");
+        var request_observe = require("js/client/requests/api/mapper/observe");
         var map_row = row.inherit({
             constructor: function map_row(_options) {
                 var base = {
@@ -64,6 +66,27 @@
                         }
                     }.bind(this));
                     rrc.request();
+
+                }.bind(this));
+
+                this.__observe = new button({
+                    text: "watch"
+                });
+                this.__observe.add_class("ui-chars-list-button");
+                this.append(this.__observe);
+                this.__observe.add_event("click", function () {
+
+                    var token_id = sessionStorage.getItem("token");
+                    var ro = new request_observe({
+                        token_id: token_id,
+                        id: this.__map_id
+                    });
+                    ro.on("response", function (_event) {
+                        if(_event.data.success) {
+                            //this.trigger("del");
+                        }
+                    }.bind(this));
+                    ro.request();
 
                 }.bind(this))
             }

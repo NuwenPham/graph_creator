@@ -4,7 +4,8 @@
 
 var _game = require("./../game/game.js");
 var _field_requests = require("./field.js");
-var request = require('request');
+//var request = require('request');
+var esi = require("./../esi");
 
 var game = {
     reg: function (_data) {
@@ -152,21 +153,22 @@ var game = {
 
         if (ward.tokens().check_token(token_id)) {
             console.log("auth_part_0: inner token success");
-            request_ccp_auth(code).then(function (_response_data) {
+            esi.ouath.token(code).then(function (_response_data) {
+
                 console.log("auth_part_1: ccp auth success");
                 access_token = _response_data.access_token;
                 token_type = _response_data.token_type;
                 expires_in = _response_data.expires_in; // seconds ?? (not sure)
                 refresh_token = _response_data.refresh_token;
-                request_user_data(access_token).then(function (_user_data) {
-                    console.log("auth_part_2: char data success");
+                esi.ouath.verify(access_token).then(function (_user_data) {
+                    console.log("auth_part_2: char data success: ("+_user_data.CharacterID+")");
 
-                    __request_char_portrait(access_token, _user_data.CharacterID).then(function (_images) {
+                    esi.characters.portrait(_user_data.CharacterID).then(function (_images) {
                         console.log("auth_part_3: portrait");
                         var user_id = ward.tokens().get_token(token_id).user_id;
                         var user = ward.users().get_user_by_id(user_id);
                         user.add_eve_char({
-                            char_id: _user_data.CharacterID,
+                            id: _user_data.CharacterID,
                             char_name: _user_data.CharacterName,
                             expires_on: _user_data.ExpiresOn,
                             expires_in: expires_in,
@@ -260,7 +262,7 @@ var request_user_data = function (_access_token) {
     }.bind(this));
 
     return p.native;
-}
+};
 
 var check_mail = function (_mail) {
     return true;
@@ -274,44 +276,6 @@ module.exports = {
         ccp_auth: game.ccp_auth
     }
 };
-
-
-var _esi_request = function (_access_token, _path, _options) {
-    var p = new promise();
-
-    var host = "https://esi.tech.ccp.is/";
-    var addr = host + _path + "?datasource=tranquility";
-
-    console.log("\n%s", addr);
-    var options = {
-        url: addr,
-        headers: {
-            Authorization: "Bearer " + _access_token,
-            "Content-Type": "application/json"
-        },
-        form: _options || {}
-    };
-
-    request.get(options, function (error, response, body) {
-        if (!error) {
-            console.log("ESI RESPONSE");
-            console.log(body);
-            console.log("");
-            p.resolve(JSON.parse(body));
-        } else {
-            p.reject(error);
-        }
-    }.bind(this));
-
-    return p.native;
-};
-
-var __request_char_portrait = function (_access_token, _char_id) {
-    var path = "latest/characters/" + _char_id + "/portrait/";
-    return _esi_request(_access_token, path);
-};
-
-
 
 
 var ERROR = {

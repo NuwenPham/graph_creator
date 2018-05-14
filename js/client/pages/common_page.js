@@ -68,27 +68,28 @@
                 this.__list.add(row3);
             },
             __init_buttons: function () {
-                this.__btn_chars = new button({
-                    text: "chars"
-                });
-                this.__content.append(this.__btn_chars);
-                this.__btn_chars.css({
-                    width: "100%"
-                });
-                this.__btn_chars.add_event("click", function () {
-                    nav.open("chars_list");
-                });
+                this.add_button({text: "chars", way: "chars_list"});
+                this.add_button({text: "maps", way: "maps_list"});
+                this.add_button({text: "auth", way: "auth"});
+                this.add_button({text: "log out", way: ""});
+            },
+            add_button: function (_options) {
+                var base = Object.extend({
+                    text: "",
+                    way: ""
+                }, _options);
 
-                this.__btn_maps = new button({
-                    text: "maps"
+                var btn = new button({
+                    text: base.text
                 });
-                this.__content.append(this.__btn_maps);
-                this.__btn_maps.css({
+                this.__content.append(btn);
+                btn.css({
                     width: "100%"
                 });
-                this.__btn_maps.add_event("click", function () {
-                    nav.open("maps_list");
+                btn.add_event("click", function () {
+                    nav.open(base.way);
                 });
+                return btn;
             }
         });
 

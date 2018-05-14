@@ -33,4 +33,5 @@
 .ui-chars-list-button{
     float: right;
     padding: 0px 3px !important;
+    margin-left: 5px;
 }

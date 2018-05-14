@@ -3,6 +3,7 @@
  */
 
 var basic = require("./../basic");
+var esi = require("./../esi");
 var Maps = basic.inherit({
     constructor: function maps(_options) {
         var options = {};
@@ -21,6 +22,14 @@ var Maps = basic.inherit({
     },
     __init: function () {
         //this.start_poll();
+
+        var __poll_tick = function () {
+            console.log("START POLL!!!");
+            this.poll();
+            setTimeout(__poll_tick, 60000);
+        }.bind(this);
+
+        __poll_tick();
     },
     add_map: function (_options) {
         var mid = this.__count++;
@@ -65,30 +74,109 @@ var Maps = basic.inherit({
         }
         return list;
     },
+    get_map: function(_mid){
+        return this.__maps[_mid];
+    },
     is_exist: function (_mid) {
         return this.__index_on_id.indexOf(_mid) != -1;
     },
     is_exist_by_name: function (_name) {
         return this.__name_on_id[_name] === undefined;
     },
-    start_poll: function () {
+    /**
+    poll logic:
+
+    |- each map
+        |- each user
+            |- each account
+                |- request_online -----|
+                |- request_location ---| 
+                |- request_ship -------|
+    |----------------------------------| this is barer
+    |- check (map has system)
+        |- IF TRUE
+        |   |- check (map has link account.system, system)
+        |       |- IF TRUE
+        |       |    |- account update_current_system system
+        |       |- IF NOT
+        |            |- map add link account.system, system
+        |            |- account update_current_system system
+        |- IF NOT
+            |- map add system
+            |- map add link account.system, system
+            |- account update_current_system system
+
+     */
+    poll: function () {
+        var count_chars = 0;
+        this.__chars_in_queue = {};
+
+
         var a = 0;
-        while(a < this.__index_on_id.length){
+        while (a < this.__index_on_id.length) { // each map
             var mid = this.__index_on_id[a];
             var map = this.__maps[mid];
             var users = map.users();
 
             var b = 0;
-            while( b < users.length){
+            while (b < users.length) { // each user
                 var uid = users[b];
                 var user = ward.users().get_user_by_id(uid);
+                var chars = user.characters();
 
+                for (var k in chars) { // each char
+                    if (!chars.hasOwnProperty(k)) continue;
+                    var char = chars[k];
 
+                    var timeout_callback = setTimeout(function (_id) {
+                        this.__chars_in_queue[_id].timeout = true;
+                    }.bind(this, char.id()), 40000);
 
+                    this.__chars_in_queue[char.id()] = {
+                        done: false,
+                        timeout: false,
+                        timeout_id: timeout_callback
+                    };
+
+                    var p = Promise.all([
+                        esi.location.current(char.access_token(), char.id()),
+                        esi.location.online(char.access_token(), char.id()),
+                        esi.location.ship(char.access_token(), char.id())
+                    ]);
+
+                    p.then(function (_id, _data) {
+                        if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
+
+                        var char_data = this.__chars_in_queue[_id];
+                        char_data.done = true;
+                        char_data.timeout = false;
+                        clearTimeout(char_data.timeout_id);
+                        this.__syncer.inc();
+                    }.bind(this, char.id()), function (_id, _data) {
+                        if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
+
+                        var char_data = this.__chars_in_queue[_id];
+                        clearTimeout(char_data.timeout_id);
+                        this.__syncer.inc();
+                    }.bind(this, char.id()));
+
+                    count_chars++;
+                }
                 b++;
             }
-
             a++;
+        }
+
+        if (count_chars > 0) {
+            this.__syncer = new Sync({
+                end: count_chars
+            });
+            this.__syncer.on("barer", function () {
+                console.log("END POLL!!!");
+            }.bind(this));
+        } else {
+            console.log("0 chars");
+            console.log("END POLL!!!");
         }
     },
     save: function () {
@@ -162,11 +250,12 @@ var Map = basic.inherit({
     },
     __init: function () {
     },
-    add_user: function () {
-
+    add_user: function (_uid) {
+        this.__users.push(_uid);
     },
-    remove_user: function () {
-
+    remove_user: function (_uid) {
+        var index = this.__users.indexOf(_uid);
+        this.__users.splice(index);
     },
     add_system: function () {
 
@@ -174,10 +263,16 @@ var Map = basic.inherit({
     remove_system: function () {
 
     },
+    has_system: function () {
+
+    },
     add_link: function () {
 
     },
     remove_link: function () {
+
+    },
+    has_link: function (_left, _right) {
 
     },
     is_public: function () {
@@ -202,6 +297,29 @@ var Map = basic.inherit({
             id: this.__id,
             users: this.__users,
             links: this.__links
+        }
+    }
+});
+
+
+var Sync = basic.inherit({
+    className: "Sync",
+    constructor: function(_options){
+        var base = {
+            end: 0
+        };
+        Object.extend(base, _options);
+        basic.prototype.constructor.call(this, base);
+        this.__end = base.end;
+        this.__count = 0;
+    },
+    destructor: function () {
+        basic.prototype.destructor.call(this);
+    },
+    inc: function () {
+        this.__count++;
+        if(this.__count == this.__end){
+            this.trigger("barer");
         }
     }
 });

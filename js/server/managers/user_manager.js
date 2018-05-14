@@ -139,6 +139,7 @@ var User = basic.inherit({
     },
     add_eve_char: function (_options) {
         var base = {
+            id: "",
             char_name: "",
             expires_on: "",
             scopes: "",
@@ -155,6 +156,7 @@ var User = basic.inherit({
         }
 
         this.__characters[base.char_name] = new EVEChar({
+            id: base.id,
             char_name: base.char_name,
             expires_on: base.expires_on,
             scopes: base.scopes,
@@ -223,7 +225,7 @@ var User = basic.inherit({
 var EVEChar = basic.inherit({
     constructor: function EVEChar(_options) {
         var base = {
-            id: -1,
+            id: "",
             char_name: "",
             expires_on: "",
             scopes: "",
@@ -257,6 +259,12 @@ var EVEChar = basic.inherit({
     },
     char_name: function () {
         return this.__char_name;
+    },
+    id: function () {
+        return this.__id;
+    },
+    access_token: function () {
+        return this.__access_token;
     },
     images: function () {
         return this.__images;

@@ -1,8 +1,7 @@
 /**
  * Created by pham on 8/8/17.
  */
-//var leveldb = require("./utils/leveldb.js");
-
+//var leveldb = require("./utils/leveldb.js")
 
 require("./globals.js");
 // requests

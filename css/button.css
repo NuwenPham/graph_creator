@@ -1,4 +1,6 @@
 .ui-btn{
+    transition: background 0.3s, color 0.2s, border-bottom 0.2s, border-right 0.2s;
+
     height: 25px !important;
     width: auto;
     border: 0 !important;
@@ -18,10 +20,9 @@
 }
 
 .ui-btn:hover{
-    transition: background 0.3s, color 0.2s, border-bottom 0.2s, border-right 0.2s;
     background: #aaa;
     color: #fff;
-    border-bottom: 2px solid #666 !important;
+    border-bottom: 1px solid #666 !important;
     border-right: 1px solid #888 !important;
 }
 
