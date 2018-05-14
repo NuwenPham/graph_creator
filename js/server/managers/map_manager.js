@@ -26,7 +26,7 @@ var Maps = basic.inherit({
         var __poll_tick = function () {
             console.log("START POLL!!!");
             this.poll();
-            setTimeout(__poll_tick, 60000);
+            setTimeout(__poll_tick, 10000);
         }.bind(this);
 
         __poll_tick();

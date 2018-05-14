@@ -3,21 +3,85 @@
  */
 var request = require('request');
 
-var _esi_bearer_request = function (_type, _access_token, _path, _options, _headers) {
+var _esi_bearer_get_request = function (_access_token, _path, _options) {
     var p = new promise();
 
-    _type = _type || "get";
+    var host = "http://esi.evetech.net/";
+    var addr = host + _path;
+
+    var base_opts = Object.extend({
+        token: _access_token,
+        datasource: "tranquility"
+    }, _options);
+
+    var arr = [];
+    for (var k in base_opts) {
+        var val = base_opts[k];
+        arr.push(k + "=" + val);
+    }
+    var query = arr.join("&");
+    addr += "?" + query;
+
+    console.log("REQUEST:\n%s", addr);
+    var options = {
+        url: addr,
+        headers: {
+            "Content-Type": "application/json",
+            Host: "esi.evetech.net"
+        }
+    };
+
+    var tries = 3;
+    var cur_tries = 0;
+    var start_time = +new Date;
+    var on_response = function (_error, _, _data) {
+        console.log("response time: ", (+new Date - start_time));
+        if (!_error) {
+            console.log("%cESI RESPONSE", "color:#fff;");
+            console.log(_data);
+            console.log("");
+            p.resolve(JSON.parse(_data));
+        } else {
+            if (cur_tries < tries) {
+                cur_tries++;
+                setTimeout(function () {
+                    request.get(options, on_response);
+                }, 1000);
+            } else {
+                p.reject(_error);
+            }
+        }
+    }.bind(this);
+    request.get(options, on_response);
+
+    return p.native;
+};
+
+var _esi_bearer_post_request = function (_access_token, _path, _options) {
+    var p = new promise();
 
     var host = "http://esi.evetech.net/";
-    var addr = host + _path + "?datasource=tranquility";
+    var addr = host + _path;
 
-    console.log("\n%s", addr);
+    var base_opts = {
+        datasource: "tranquility"
+    };
+
+    var arr = [];
+    for (var k in base_opts) {
+        var val = base_opts[k];
+        arr.push(k + "=" + val);
+    }
+    var query = arr.join("&");
+    addr += "=" + query;
+
+    console.log("REQUEST: \n%s", addr);
     var options = {
         url: addr,
         headers: {
             Authorization: "Bearer " + _access_token,
             "Content-Type": "application/json",
-            Host: "esi.tech.ccp.is"
+            Host: "esi.evetech.net"
         },
         form: _options || {}
     };
@@ -35,21 +99,68 @@ var _esi_bearer_request = function (_type, _access_token, _path, _options, _head
         } else {
             if (cur_tries < tries) {
                 cur_tries++;
-                setTimeout(function () {request[_type](options, on_response);}, 1000);
+                setTimeout(function () {request.post(options, on_response);}, 1000);
             } else {
                 p.reject(_error);
             }
         }
     }.bind(this);
-    request[_type](options, on_response);
+    request.post(options, on_response);
 
     return p.native;
 };
 
-var _esi_public_request = function (_type, _path, _options) {
+
+
+var _esi_public_get_request = function (_path, _options) {
     var p = new promise();
 
-    _type = _type || "get";
+    var host = "http://esi.evetech.net/";
+    var addr = host + _path;
+
+    var base_opts = Object.extend({
+        datasource: "tranquility"
+    }, _options);
+
+    var arr = [];
+    for (var k in base_opts){
+        var val = base_opts[k];
+        arr.push( k + "=" + val);
+    }
+    var query = arr.join("&");
+    addr += "?" + query;
+
+    console.log("REQUEST:\n%s", addr);
+    var options = {
+        url: addr
+    };
+
+    var tries = 3;
+    var cur_tries = 0;
+    var start_time = +new Date;
+    var on_response = function (_error, _, _data) {
+        console.log("response time: ", (+new Date - start_time));
+        if (!_error) {
+            console.log("%cESI RESPONSE", "color:#fff;");
+            console.log(_data);
+            console.log("");
+            p.resolve(JSON.parse(_data));
+        } else {
+            if (cur_tries < tries) {
+                cur_tries++;
+                setTimeout(function () {request.get(options, on_response);}, 1000);
+            } else {
+                p.reject(_error);
+            }
+        }
+    }.bind(this);
+    request.get(options, on_response);
+
+    return p.native;
+};
+
+var _esi_public_post_request = function (_path, _options) {
+    var p = new promise();
 
     var host = "http://esi.evetech.net/";
     var addr = host + _path + "?datasource=tranquility";
@@ -73,13 +184,13 @@ var _esi_public_request = function (_type, _path, _options) {
         } else {
             if (cur_tries < tries) {
                 cur_tries++;
-                setTimeout(function () {request[_type](options, on_response);}, 1000);
+                setTimeout(function () {request.post(options, on_response);}, 1000);
             } else {
                 p.reject(_error);
             }
         }
     }.bind(this);
-    request[_type](options, on_response);
+    request.post(options, on_response);
 
     return p.native;
 };
@@ -141,28 +252,28 @@ var __esi_oauth_verify = function (_access_token) {
 
 var __esi_characters_portrait = function ( _char_id) {
     var path = "dev/characters/" + _char_id + "/portrait/";
-    return _esi_public_request("get", path);
+    return _esi_public_get_request(path);
 };
 
 var __esi_location_current = function (_access_token, _char_id) {
-    var path = "dev/characters/" + _char_id + "/location/";
-    return _esi_bearer_request("get",_access_token, path);
+    var path = "latest/characters/" + _char_id + "/location/";
+    return _esi_bearer_get_request(_access_token, path);
 };
 
 var __esi_location_online = function (_access_token, _char_id) {
     var path = "dev/characters/" + _char_id + "/online/";
-    return _esi_bearer_request("get",_access_token, path);
+    return _esi_bearer_get_request(_access_token, path);
 };
 
 var __esi_location_ship = function (_access_token, _char_id) {
     var path = "dev/characters/" + _char_id + "/ship/";
-    return _esi_bearer_request("get",_access_token, path);
+    return _esi_bearer_get_request(_access_token, path);
 };
 
 
 var __esi_alliance_all = function (_access_token) {
     var path = "dev/alliances/";
-    return _esi_bearer_request("get", _access_token, path);
+    return _esi_bearer_get_request( _access_token, path);
 };
 
 
@@ -203,7 +314,7 @@ var esi = {
     characters: {
         portrait: __esi_characters_portrait
     },
-    request: _esi_bearer_request,
+    //request: _esi_bearer_request,
     ouath: {
         token: __esi_oauth_token,
         verify: __esi_oauth_verify
