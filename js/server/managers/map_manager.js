@@ -21,15 +21,15 @@ var Maps = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
-        //this.start_poll();
+        setTimeout(this.poll.bind(this), 5000);
 
-        var __poll_tick = function () {
-            console.log("START POLL!!!");
-            this.poll();
-            setTimeout(__poll_tick, 10000);
-        }.bind(this);
-
-        __poll_tick();
+        //var __poll_tick = function () {
+        //    console.log("START POLL!!!");
+        //    this.poll();
+        //    setTimeout(__poll_tick, 10000);
+        //}.bind(this);
+        //
+        //__poll_tick();
     },
     add_map: function (_options) {
         var mid = this.__count++;
@@ -108,76 +108,83 @@ var Maps = basic.inherit({
 
      */
     poll: function () {
+        console.log("START POLL!!!");
         var count_chars = 0;
         this.__chars_in_queue = {};
 
+        if(!this.__is_not_complete) {
+            var a = 0;
+            while (a < this.__index_on_id.length) { // each map
+                var mid = this.__index_on_id[a];
+                var map = this.__maps[mid];
+                var users = map.users();
 
-        var a = 0;
-        while (a < this.__index_on_id.length) { // each map
-            var mid = this.__index_on_id[a];
-            var map = this.__maps[mid];
-            var users = map.users();
+                var b = 0;
+                while (b < users.length) { // each user
+                    var uid = users[b];
+                    var user = ward.users().get_user_by_id(uid);
+                    var chars = user.characters();
 
-            var b = 0;
-            while (b < users.length) { // each user
-                var uid = users[b];
-                var user = ward.users().get_user_by_id(uid);
-                var chars = user.characters();
+                    for (var k in chars) { // each char
+                        if (!chars.hasOwnProperty(k)) continue;
+                        var char = chars[k];
 
-                for (var k in chars) { // each char
-                    if (!chars.hasOwnProperty(k)) continue;
-                    var char = chars[k];
+                        var timeout_callback = setTimeout(function (_id) {
+                            this.__chars_in_queue[_id].timeout = true;
+                        }.bind(this, char.id()), 40000);
 
-                    var timeout_callback = setTimeout(function (_id) {
-                        this.__chars_in_queue[_id].timeout = true;
-                    }.bind(this, char.id()), 40000);
+                        this.__chars_in_queue[char.id()] = {
+                            done: false,
+                            timeout: false,
+                            timeout_id: timeout_callback
+                        };
 
-                    this.__chars_in_queue[char.id()] = {
-                        done: false,
-                        timeout: false,
-                        timeout_id: timeout_callback
-                    };
+                        var p = Promise.all([
+                            esi.location.current(char.access_token(), char.id()),
+                            esi.location.online(char.access_token(), char.id()),
+                            esi.location.ship(char.access_token(), char.id())
+                        ]);
 
-                    var p = Promise.all([
-                        esi.location.current(char.access_token(), char.id()),
-                        esi.location.online(char.access_token(), char.id()),
-                        esi.location.ship(char.access_token(), char.id())
-                    ]);
+                        p.then(function (_id, _data) {
+                            if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
 
-                    p.then(function (_id, _data) {
-                        if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
+                            var char_data = this.__chars_in_queue[_id];
+                            char_data.done = true;
+                            char_data.timeout = false;
+                            clearTimeout(char_data.timeout_id);
+                            this.__syncer.inc();
+                        }.bind(this, char.id()), function (_id, _data) {
+                            if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
 
-                        var char_data = this.__chars_in_queue[_id];
-                        char_data.done = true;
-                        char_data.timeout = false;
-                        clearTimeout(char_data.timeout_id);
-                        this.__syncer.inc();
-                    }.bind(this, char.id()), function (_id, _data) {
-                        if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
+                            var char_data = this.__chars_in_queue[_id];
+                            clearTimeout(char_data.timeout_id);
+                            this.__syncer.inc();
+                        }.bind(this, char.id()));
 
-                        var char_data = this.__chars_in_queue[_id];
-                        clearTimeout(char_data.timeout_id);
-                        this.__syncer.inc();
-                    }.bind(this, char.id()));
-
-                    count_chars++;
+                        count_chars++;
+                    }
+                    b++;
                 }
-                b++;
+                a++;
             }
-            a++;
+
+            if (count_chars > 0) {
+                this.__syncer = new Sync({
+                    end: count_chars
+                });
+                this.__syncer.on("barer", function () {
+                    console.log("END POLL!!!");
+                    this.__is_not_complete = false;
+                    setTimeout(this.poll.bind(this), 1000);
+                }.bind(this));
+            } else {
+                console.log("0 chars");
+                console.log("END POLL!!!");
+                setTimeout(this.poll.bind(this), 1000);
+            }
+            this.__is_not_complete = true;
         }
 
-        if (count_chars > 0) {
-            this.__syncer = new Sync({
-                end: count_chars
-            });
-            this.__syncer.on("barer", function () {
-                console.log("END POLL!!!");
-            }.bind(this));
-        } else {
-            console.log("0 chars");
-            console.log("END POLL!!!");
-        }
     },
     save: function () {
         var maps_res = {};
