@@ -159,10 +159,11 @@ var _esi_public_get_request = function (_path, _options) {
         console.log("response time: ", (+new Date - start_time));
         if (!_error) {
             console.log("ESI GET RESPONSE");
+            console.log("");
             //console.log("x-esi-error-limit-remain", _body.headers["x-esi-error-limit-remain"]);
             //console.log("x-esi-error-limit-reset", _body.headers["x-esi-error-limit-reset"]);
             //console.log(_data);
-            console.log("");
+            console.log(_body.headers);
             p.resolve(JSON.parse(_data), _body.headers, _req);
         } else {
             //if (cur_tries < tries) {
@@ -344,7 +345,7 @@ var __esi_alliance_all = function () {
 
 
 var __esi_alliance_get = function (_alli_id) {
-    var path = "dev/alliances/" + _alli_id + "/";
+    var path = "latest/alliances/" + _alli_id + "/";
     return _esi_public_get_request(path);
 };
 

@@ -71,15 +71,15 @@ var __get = function (_options, _callback) {
         form: {},
         host: "localhost",
         //port: 80,
-        timeout: 2000,
+        timeout: 0,
         agent: false,
         path: "/",
         method: "GET"
     }, _options);
 
     var headers = {
-        //"Content-Type": 'application/json',
-        //"Content-Length": Buffer.byteLength(JSON.stringify(base.form))
+        "content-type": /*'application/json'*/"application/x-www-form-urlencoded",
+        "content-length": Buffer.byteLength(JSON.stringify(base.form))
     };
 
     _options.headers && Object.extend(headers, _options.headers);
@@ -111,7 +111,7 @@ var __get = function (_options, _callback) {
         _callback(_e, req);
     });
 
-    req.setTimeout(200000);
+    req.setTimeout(0);
 
     // write data to request body
     req.write(JSON.stringify(base.form));
