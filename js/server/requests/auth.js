@@ -52,12 +52,12 @@ var game = {
             password: pass_1
         });
 
-        if(uid >= 0){
+        if (uid >= 0) {
             ward.save();
             var token = ward.tokens().create_token(uid, 1000 * 60 * 60 * 24);
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
-                user_id : uid,
+                user_id: uid,
                 token: token,
                 success: true,
                 command_addr: ["response_reg"]
@@ -89,7 +89,7 @@ var game = {
 
         var user = ward.users().get_user_by_mail(mail);
 
-        if(!user){
+        if (!user) {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 command_addr: ["response_auth"],
@@ -101,7 +101,7 @@ var game = {
         }
 
 
-        if(user.password() != pass){
+        if (user.password() != pass) {
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
                 command_addr: ["response_auth"],
@@ -153,6 +153,79 @@ var game = {
 
         if (ward.tokens().check_token(token_id)) {
             console.log("auth_part_0: inner token success");
+            esi.ouath.token(code, function (_err, _body, _response_data) {
+                console.log("auth_part_1: ccp auth success");
+                if (_err) {
+                    send_error(_response_data, "failed on ccp auth (no response from ccp server)", ERROR.CCP_AUTH_FAILED);
+                    return;
+                }
+
+                access_token = _response_data.access_token;
+                token_type = _response_data.token_type;
+                expires_in = _response_data.expires_in; // seconds ?? (not sure)
+                refresh_token = _response_data.refresh_token;
+
+                esi.ouath.verify(access_token, function (_err, _body, _user_data) {
+                    console.log("auth_part_2: char data success: (" + _user_data.CharacterID + ")");
+
+                    if (_err) {
+                        send_error(_data, "failed on request user data", ERROR.CCP_DATA_FAILED);
+                        return;
+                    }
+
+                    esi.characters.portrait(_user_data.CharacterID, function (_err, _body, _images) {
+                        console.log("auth_part_3: portrait");
+                        var user_id = ward.tokens().get_token(token_id).user_id;
+                        var user = ward.users().get_user_by_id(user_id);
+                        user.add_eve_char({
+                            id: _user_data.CharacterID,
+                            char_name: _user_data.CharacterName,
+                            expires_on: _user_data.ExpiresOn,
+                            expires_in: expires_in,
+                            real_expires_in: +new Date + expires_in * 1000,
+                            scopes: _user_data.Scopes,
+                            character_owner_hash: _user_data.CharacterOwnerHash,
+                            access_token: access_token,
+                            token_type: _user_data.TokenType,
+                            images: _images,
+                            refresh_token: refresh_token
+                        });
+                        ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                            client_id: _data.client_id,
+                            success: true,
+                            command_addr: ["response_ccp_auth"]
+                        });
+                        ward.save();
+                    });
+
+                }.bind(this));
+            }.bind(this));
+        } else {
+            send_error(_data, "user not exist", ERROR.BAD_TOKEN);
+        }
+
+        var send_error = function (_data, _error_reason, _error_id) {
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                success: false,
+                reason: _error_reason,
+                error_id: _error_id,
+                command_addr: ["response_ccp_auth"]
+            });
+        }
+
+    },
+    ccp_auth_old: function (_data) {
+        var code = _data.event.code;
+        var token_id = _data.event.token_id;
+
+        var access_token = "";
+        var token_type = "";
+        var expires_in = -1;
+        var refresh_token = "";
+
+        if (ward.tokens().check_token(token_id)) {
+            console.log("auth_part_0: inner token success");
             esi.ouath.token(code).then(function (_response_data) {
 
                 console.log("auth_part_1: ccp auth success");
@@ -161,7 +234,7 @@ var game = {
                 expires_in = _response_data.expires_in; // seconds ?? (not sure)
                 refresh_token = _response_data.refresh_token;
                 esi.ouath.verify(access_token).then(function (_user_data) {
-                    console.log("auth_part_2: char data success: ("+_user_data.CharacterID+")");
+                    console.log("auth_part_2: char data success: (" + _user_data.CharacterID + ")");
 
                     esi.characters.portrait(_user_data.CharacterID).then(function (_images) {
                         console.log("auth_part_3: portrait");

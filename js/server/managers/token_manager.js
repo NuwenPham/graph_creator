@@ -60,10 +60,14 @@ var tokens = basic.inherit({
         }
     },
     restore: function (_data) {
+        console.log("Token manager: restoring START...");
+
         if(_data){
             this.__tokens = _data.tokens;
             this.__uid_on_token = _data.uid_on_token;
         }
+
+        console.log("Token manager: restoring END...");
     }
 });
 

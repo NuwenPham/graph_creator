@@ -1,14 +1,15 @@
+global._CLIENT_ID = "804ba189451a4b12af36a1f770d9a12d";
+global._SECRET_KEY = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
+
 var _promise = require("./utils/promise.js");
 var _ward = require("./ward.js");
 var _request_system = require("./utils/request_system");
+
 global.promise = _promise;
 global.rsys = new _request_system();
 
-//global.ward = new _ward();
-//global.ward.__init();
-
-global._CLIENT_ID = "804ba189451a4b12af36a1f770d9a12d";
-global._SECRET_KEY = "ycOmcLziPYTsCydxIxAgdhEsILr7hzRAgMKCzQBu";
+global.ward = new _ward();
+global.ward.__init();
 
 global._ERROR = {
     ACCOUNT_DATA_ERROR: "ACCOUNT_DATA_ERROR",

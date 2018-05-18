@@ -3,9 +3,7 @@
  */
 var request = require('request');
 
-var __esi_oauth_token = function (_code) {
-    var p = new promise();
-
+var __esi_oauth_token = function (_code, _callback) {
     var res = _CLIENT_ID + ":" + _SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
@@ -22,20 +20,11 @@ var __esi_oauth_token = function (_code) {
     };
 
     request.post(options, function (error, response, body) {
-        if (!error) {
-            console.log(body);
-            p.resolve(JSON.parse(body));
-        } else {
-            p.reject(error);
-        }
+        _callback(error, response, JSON.parse(body));
     }.bind(this));
-
-    return p.native;
 };
 
-var __esi_oauth_verify = function (_access_token) {
-    var p = new promise();
-
+var __esi_oauth_verify = function (_access_token, _callback) {
     var options = {
         url: 'https://login.eveonline.com/oauth/verify',
         headers: {
@@ -45,15 +34,29 @@ var __esi_oauth_verify = function (_access_token) {
     };
 
     request.get(options, function (error, response, body) {
-        if (!error) {
-            console.log(body);
-            p.resolve(JSON.parse(body));
-        } else {
-            p.reject(error);
-        }
+        _callback(error, response, JSON.parse(body));
     }.bind(this));
+};
 
-    return p.native;
+var __sso_oath_refresh_token = function (_refresh_token, _callback) {
+    var res = _CLIENT_ID + ":" + _SECRET_KEY;
+    var encoded = new Buffer(res).toString('base64');
+    var options = {
+        url: 'https://login.eveonline.com/oauth/token',
+        headers: {
+            Authorization: "Basic " + encoded,
+            "Content-Type": "application/json",
+            Host: "login.eveonline.com"
+        },
+        form: {
+            grant_type: "refresh_token",
+            refresh_token: _refresh_token
+        }
+    };
+
+    request.post(options, function (error, body, data) {
+        _callback(error, body, JSON.parse(data))
+    }.bind(this));
 };
 
 
@@ -62,14 +65,14 @@ var __esi_characters_portrait = function (_char_id, _callback) {
     return rsys.get_public(path, {}, _callback);
 };
 
-var __esi_location_current = function (_access_token, _char_id) {
+var __esi_location_current = function (_access_token, _char_id, _callback) {
     var path = "latest/characters/" + _char_id + "/location/";
-    return _esi_bearer_get_request(_access_token, path);
+    return rsys.get_bearer(_access_token, path, {}, _callback);
 };
 
-var __esi_location_online = function (_access_token, _char_id) {
+var __esi_location_online = function (_access_token, _char_id, _callback) {
     var path = "dev/characters/" + _char_id + "/online/";
-    return _esi_bearer_get_request(_access_token, path);
+    return rsys.get_bearer(_access_token, path, {}, _callback);
 };
 
 var __esi_location_ship = function (_access_token, _char_id) {
@@ -96,8 +99,8 @@ var esi = {
     characters: {
         portrait: __esi_characters_portrait
     },
-    //request: _esi_bearer_request,
     ouath: {
+        refresh_token: __sso_oath_refresh_token,
         token: __esi_oauth_token,
         verify: __esi_oauth_verify
     },

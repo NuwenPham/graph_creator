@@ -73,10 +73,12 @@ var ward = basic.inherit({
         this.__data_manager.save();
     },
     restore: function () {
+        console.log("\nRESTORING DATA STARTED...");
         var data = this.__data_manager.data();
         this.__token_manager.restore(data.token);
         this.__users.restore(data.user_data);
         this.__maps.restore(data.map_manager);
+        console.log("RESTORING DATA COMPLETED.")
     }
 
 });

@@ -163,7 +163,7 @@ var _esi_public_get_request = function (_path, _options, _callback) {
     var on_response = function (_error, _body, _data) {
         console.log("response time: ", (+new Date - start_time));
         console.log("GET PUBLIC ESI RESPONSE");
-        _callback(_error, _body, _data);
+        _callback(_error, _body, JSON.parse(_data));
     }.bind(this);
     request.get(options, on_response);
 };
@@ -200,10 +200,9 @@ var _esi_bearer_get_request = function (_access_token, _path, _options, _callbac
     var on_response = function (_error, _body, _data) {
         console.log("response time: ", (+new Date - start_time));
         console.log("GET BEARER ESI RESPONSE");
-        _callback(_error, _body, _data);
-    };
+        _callback(_error, _body, JSON.parse(_data));
+    }.bind(this);
 
-    bind(this);
     request.get(options, on_response);
 };
 
@@ -238,7 +237,7 @@ var _esi_bearer_post_request = function (_access_token, _path, _options, _callba
     var on_response = function (_error, _body, _data) {
         console.log("response time: ", (+new Date - start_time));
         console.log("GET BEARER ESI RESPONSE");
-        _callback(_error, _body, _data);
+        _callback(_error, _body, JSON.parse(_data));
     }.bind(this);
     request.post(options, on_response);
 };
