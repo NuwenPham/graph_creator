@@ -8,22 +8,25 @@ require("./globals.js");
 
 var esi = require("./esi.js");
 
-var count = 0;
-var length = 10000;
+
 var request = function () {
-    if(count < length) {
-        esi.alliance.get("99007044").then(function (_data, _body, _req) {
-            count++;
-            console.log(count);
-            request();
-        }, function (_e) {
-            _e[1].abort();
-            console.log("try...");
-            setTimeout(request, 1000);
-        }.bind(this));
+    esi.alliance.get("99007044", function (_data, _body, _req) {
+        count++;
+        console.log(count);
+    });
+};
+
+var a = 0;
+var end = 20000;
+var req = function () {
+    if( a < end){
+        request();
+        setTimeout(req, 1);
+        a++;
     }
 };
-request();
+req();
+
 
 
 //// requests
