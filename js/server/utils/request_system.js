@@ -26,10 +26,10 @@ var reqsys = function () {
     // ----------------------------------------
     //  METHOD |   | GET | POST | PUT | DELETE |
     //  -------|---|-----|------|-----|--------|
-    //  TYPE   |   |  0  |   1  |  2  |   3    |
+    //  TYPE   |   |   0 |   1  |  2  |    3   |
     // --------|---|-----|------|-----|--------|
-    //  PUBLIC | 0 |  00 |  01  | 02  |  03    |
-    //  BEARER | 1 |  10 |  11  | 12  |  13    |
+    //  PUBLIC | 0 |  00 |  01  | 02  |   03   |
+    //  BEARER | 1 |  10 |  11  | 12  |   13   |
 
     this.__methods = [
         [_esi_public_get_request, _esi_bearer_get_request],

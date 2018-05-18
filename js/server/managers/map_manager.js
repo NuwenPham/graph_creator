@@ -83,109 +83,7 @@ var Maps = basic.inherit({
     is_exist_by_name: function (_name) {
         return this.__name_on_id[_name] === undefined;
     },
-    /**
-    poll logic:
 
-    |- each map
-        |- each user
-            |- each account
-                |- request_online -----|
-                |- request_location ---| 
-                |- request_ship -------|
-    |----------------------------------| this is barer
-    |- check (map has system)
-        |- IF TRUE
-        |   |- check (map has link account.system, system)
-        |       |- IF TRUE
-        |       |    |- account update_current_system system
-        |       |- IF NOT
-        |            |- map add link account.system, system
-        |            |- account update_current_system system
-        |- IF NOT
-            |- map add system
-            |- map add link account.system, system
-            |- account update_current_system system
-
-     */
-    poll: function () {
-        console.log("START POLL!!!");
-        var count_chars = 0;
-        this.__chars_in_queue = {};
-
-        if(!this.__is_not_complete) {
-            var a = 0;
-            while (a < this.__index_on_id.length) { // each map
-                var mid = this.__index_on_id[a];
-                var map = this.__maps[mid];
-                var users = map.users();
-
-                var b = 0;
-                while (b < users.length) { // each user
-                    var uid = users[b];
-                    var user = ward.users().get_user_by_id(uid);
-                    var chars = user.characters();
-
-                    for (var k in chars) { // each char
-                        if (!chars.hasOwnProperty(k)) continue;
-                        var char = chars[k];
-
-                        var timeout_callback = setTimeout(function (_id) {
-                            this.__chars_in_queue[_id].timeout = true;
-                        }.bind(this, char.id()), 40000);
-
-                        this.__chars_in_queue[char.id()] = {
-                            done: false,
-                            timeout: false,
-                            timeout_id: timeout_callback
-                        };
-
-                        var p = Promise.all([
-                            esi.location.current(char.access_token(), char.id()),
-                            esi.location.online(char.access_token(), char.id()),
-                            esi.location.ship(char.access_token(), char.id())
-                        ]);
-
-                        p.then(function (_id, _data) {
-                            if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
-
-                            var char_data = this.__chars_in_queue[_id];
-                            char_data.done = true;
-                            char_data.timeout = false;
-                            clearTimeout(char_data.timeout_id);
-                            this.__syncer.inc();
-                        }.bind(this, char.id()), function (_id, _data) {
-                            if (this.__chars_in_queue[_id] && this.__chars_in_queue[_id].timeout) return;
-
-                            var char_data = this.__chars_in_queue[_id];
-                            clearTimeout(char_data.timeout_id);
-                            this.__syncer.inc();
-                        }.bind(this, char.id()));
-
-                        count_chars++;
-                    }
-                    b++;
-                }
-                a++;
-            }
-
-            if (count_chars > 0) {
-                this.__syncer = new Sync({
-                    end: count_chars
-                });
-                this.__syncer.on("barer", function () {
-                    console.log("END POLL!!!");
-                    this.__is_not_complete = false;
-                    setTimeout(this.poll.bind(this), 1000);
-                }.bind(this));
-            } else {
-                console.log("0 chars");
-                console.log("END POLL!!!");
-                setTimeout(this.poll.bind(this), 1000);
-            }
-            this.__is_not_complete = true;
-        }
-
-    },
     save: function () {
         var maps_res = {};
         for(var k in this.__maps){
@@ -236,6 +134,10 @@ var Map = basic.inherit({
             owner: -1,
             admins: [],
             users: [],
+            systems: {},
+            systems_sid_on_id: {},
+            systems_index_on_id: [],
+            systems_counter: 0,
             links: []
         };
         Object.extend(base, _options);
@@ -249,6 +151,10 @@ var Map = basic.inherit({
         this.__id = base.id;
         this.__users = base.users;
         this.__links = base.links;
+        this.__systems = base.systems;
+        this.__systems_sid_on_id = base.systems_sid_on_id;
+        this.__systems_index_on_id = base.systems_index_on_id;
+        this.__systems_counter = base.systems_counter;
 
         this.__init();
     },
@@ -256,6 +162,7 @@ var Map = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
+
     },
     add_user: function (_uid) {
         this.__users.push(_uid);
@@ -264,14 +171,23 @@ var Map = basic.inherit({
         var index = this.__users.indexOf(_uid);
         this.__users.splice(index);
     },
-    add_system: function () {
-
+    add_system: function (_solar_system_id, _station_id, _structure_id) {
+        var sid = this.__systems_counter++;
+        this.__systems[sid] = new SolSystem({
+            solar_system_id: _solar_system_id,
+            station_id: _station_id,
+            structure_id: _structure_id
+        });
+        this.__systems_index_on_id.push(sid);
+        this.__systems_sid_on_id[_solar_system_id] = sid;
+        return sid;
     },
     remove_system: function () {
 
     },
-    has_system: function () {
-
+    has_system: function (_solar_system_id) {
+        var index = this.__systems_sid_on_id.indexOf(_solar_system_id);
+        return index != -1;
     },
     add_link: function () {
 
@@ -294,8 +210,116 @@ var Map = basic.inherit({
     users: function () {
         return this.__users;
     },
+    /**
+     poll logic:
+
+
+     |- each user
+     |   |- each account
+     |       |- request_online -----|
+     |       |- request_location ---|
+     |                              |
+     |------------------------------| this is bearer
+
+
+     */
+    poll: function () {
+        var count_chars = 0;
+        this.__chars_in_queue = {};
+
+        var a = 0;
+        while( a < this.__users.length) {
+            var user = ward.users().get_user_by_id(uid);
+            var chars = user.characters();
+
+            for (var k in chars) { // each char
+                if (!chars.hasOwnProperty(k)) continue;
+                var char = chars[k];
+
+                this.__chars_in_queue[char.id()] = {
+                    done: false
+                };
+
+                esi.location.online(char.access_token(), char.id(), function (_cid, _err, _body, _online_data) {
+                    if(_err){
+                        console.log(_err);
+                        return;
+                    }
+
+                    esi.location.current(char.access_token(), char.id(), function (_cid, _err, _body, _loc_data) {
+                        if(_err){
+                            console.log(_err);
+                            return;
+                        }
+
+                        var char_data = this.__chars_in_queue[_cid];
+                        char_data.done = true;
+                        char_data.location = _loc_data;
+                        char_data.online = _online_data;
+                        this.__syncer.inc();
+                    }.bind(this, _cid));
+                }.bind(this, char.id()));
+                count_chars++;
+            }
+
+            a++;
+        }
+
+        if (count_chars > 0) {
+            this.__syncer = new Sync({
+                end: count_chars
+            });
+            this.__syncer.on("bearer", function () {
+                console.log("END POLL!!!");
+                this.__process_map_data();
+                this.__is_not_complete = false;
+                setTimeout(this.poll.bind(this), 3000);
+            }.bind(this));
+        } else {
+            console.log("0 chars");
+            console.log("END POLL!!!");
+            setTimeout(this.poll.bind(this), 3000);
+        }
+        this.__is_not_complete = true;
+    },
+    /**
+     |-----------------------
+     |- check (map has system)
+     |   |- IF TRUE
+     |   |   |- check (map has link account.system, system)
+     |   |       |- IF TRUE
+     |   |       |    |- account update_current_system system
+     |   |       |- IF NOT
+     |   |            |- map add link account.system, system
+     |   |            |- account update_current_system system
+     |   |- IF NOT
+     |       |- map add system
+     |       |- map add link account.system, system
+     |       |- account update_current_system system
+     */
+    __process_map_data: function () {
+        for(var k in this.__chars_in_queue){
+            if(!this.__chars_in_queue.hasOwnProperty(k)) continue;
+            var info = this.__chars_in_queue[k];
+
+        }
+    },
     save: function () {
+        var systems = [];
+        var a = 0;
+        while( a < this.__systems_index_on_id.length){
+            var sysid = this.__systems_index_on_id[a];
+            var sys = this.__systems[sysid];
+            a++;
+        }
+
+
         return {
+            systems: this.__systems,
+            systems_sid_on_id: this.__systems_sid_on_id,
+            systems_index_on_id: this.__systems_index_on_id,
+            systems_counter: this.__systems_counter,
+
             password: this.__password,
             name: this.__name,
             is_public: this.__is_public,
@@ -305,9 +329,53 @@ var Map = basic.inherit({
             users: this.__users,
             links: this.__links
         }
+    },
+    restore: function () {
+
     }
 });
 
+var SolSystem = basic.inherit({
+    constructor: function Map(_options) {
+        var base = {
+            solar_system_id: -1, // location id
+            station_id: -1,
+            structure_id: -1
+        };
+        Object.extend(base, _options);
+        basic.prototype.constructor.call(this, base);
+
+        this.__solar_system_id = base.solar_system_id;
+        this.__station_id = base.station_id;
+        this.__structure_id = base.structure_id;
+
+        this.__init();
+    },
+    __init: function () {
+
+    },
+    solar_system_id: function () {
+        return this.__solar_system_id;
+    },
+    station_id: function () {
+        return this.__station_id;
+    },
+    structure_id: function () {
+        return this.__structure_id;
+    },
+    save: function () {
+        return {
+            solar_system_id: this.__solar_system_id,
+            station_id: this.__station_id,
+            structure_id: this.__structure_id
+        }
+    },
+    restore: function (_data) {
+        this.__solar_system_id = _data.solar_system_id;
+        this.__station_id = _data.station_id;
+        this.__structure_id = _data.structure_id;
+    }
+});
 
 var Sync = basic.inherit({
     className: "Sync",
@@ -326,10 +394,9 @@ var Sync = basic.inherit({
     inc: function () {
         this.__count++;
         if(this.__count == this.__end){
-            this.trigger("barer");
+            this.trigger("bearer");
         }
     }
 });
-
 
 module.exports = Maps;

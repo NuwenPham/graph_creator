@@ -11,8 +11,8 @@ var esi = require("./esi.js");
 
 var request = function () {
     esi.alliance.get("99007044", function (_data, _body, _req) {
-        count++;
-        console.log(count);
+        // count++;
+        // console.log(count);
     });
 };
 
