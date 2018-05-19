@@ -184,7 +184,7 @@ var _esi_bearer_get_request = function (_access_token, _path, _options, _callbac
     var query = arr.join("&");
     addr += "?" + query;
 
-    console.log("GET BEARER ESI:\n%s", addr);
+    console.log("GET BEARER ESI: %s", addr);
     var options = {
         url: addr,
         pool: {maxSockets: Infinity},
@@ -198,8 +198,7 @@ var _esi_bearer_get_request = function (_access_token, _path, _options, _callbac
 
     var start_time = +new Date;
     var on_response = function (_error, _body, _data) {
-        console.log("response time: ", (+new Date - start_time));
-        console.log("GET BEARER ESI RESPONSE");
+        console.log("GET BEARER ESI RESPONSE. response time: ", (+new Date - start_time));
         _callback(_error, _body, JSON.parse(_data));
     }.bind(this);
 

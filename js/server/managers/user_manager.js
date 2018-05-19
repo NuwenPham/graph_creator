@@ -95,19 +95,15 @@ var users = basic.inherit({
         console.log("User manager START restoring...");
 
         if (_data) {
-            //this.__users = _data.users;
-
-            var rest_users = {};
             var a = 0;
             while(a < _data.users.length){
                 var u_data = _data.users[a];
                 var user_inst = new User();
                 user_inst.restore(u_data);
-                rest_users[u_data.id] = user_inst;
+                this.__users[u_data.id] = user_inst;
                 a++;
             }
 
-            this.__users = rest_users;
             this.__index_on_id = _data.index_on_id;
             this.__mail_on_id = _data.mail_on_id;
             this.__count = _data.count;
