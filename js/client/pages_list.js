@@ -12,7 +12,8 @@
         "js/client/pages/chars_list",
         "js/client/pages/maps_list",
         "js/client/pages/add_map",
-        "js/client/pages/common_page"
+        "js/client/pages/common_page",
+        "js/client/pages/map"
     ];
     define(name, libs, function () {
         var obj = {};

@@ -109,8 +109,37 @@ var mapper = {
             var user = ward.users().get_user_by_id(uid);
 
         }
-    }
+    },
+    locations: function (_data) {
+        var token_id = _data.event.token_id;
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+        }
+    },
+    links: function (_data) {
+        var token_id = _data.event.token_id;
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+        }
+    },
+    topo: function (_data) {
+        var token_id = _data.event.token_id;
+        if (ward.tokens().check_token(token_id)) {
+            var t = ward.tokens().get_token(token_id);
+            var map_id = _data.event.map_id;
+            var map = ward.maps().get_map(map_id);
+            var systems = map.systems_data();
+            var links = map.links_data();
 
+            ward.dispatcher().send(_data.connection_id, _data.server_id, {
+                client_id: _data.client_id,
+                systems: systems,
+                links: links,
+                success: true,
+                command_addr: ["response_maps"]
+            });
+        }
+    }
 
 };
 
@@ -120,6 +149,7 @@ module.exports = {
         list: mapper.list,
         observe: mapper.observe,
         add: mapper.add,
+        topo: mapper.topo,
         remove: mapper.remove
     }
 };

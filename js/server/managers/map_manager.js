@@ -376,12 +376,11 @@ var Map = basic.inherit({
                     }
                 }
                 char.set_location(info.location.solar_system_id);
-
             }
         }
         ward.save();
     },
-    save: function () {
+    systems_data: function () {
         var systems = [];
         var a = 0;
         while( a < this.__systems_index_on_id.length){
@@ -390,23 +389,27 @@ var Map = basic.inherit({
             systems.push(sys.save());
             a++;
         }
-
+        return systems;
+    },
+    links_data: function () {
         var links = [];
-        a = 0;
+        var a = 0;
         while( a < this.__links_index_on_id.length){
             var lid = this.__links_index_on_id[a];
             var link = this.__links[lid];
             links.push(link.save());
             a++;
         }
-
-        return {
-            systems: systems,
+        return links;
+    },
+    save: function () {
+          return {
+            systems: this.systems_data(),
             systems_sid_on_id: this.__systems_sid_on_id,
             systems_index_on_id: this.__systems_index_on_id,
             systems_counter: this.__systems_counter,
 
-            links: links,
+            links: this.links_data(),
             links_counter: this.__links_counter,
             links_index_on_id: this.__links_index_on_id,
 

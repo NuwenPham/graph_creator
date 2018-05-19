@@ -89,6 +89,16 @@
                     ro.request();
 
                 }.bind(this))
+
+
+                this.__go = new button({
+                    text: "go!"
+                });
+                this.__go.add_class("ui-chars-list-button");
+                this.append(this.__go);
+                this.__go.add_event("click", function () {
+                    nav.open("map?" + this.__map_id);
+                }.bind(this))
             }
         });
 

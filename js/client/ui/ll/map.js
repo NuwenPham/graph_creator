@@ -46,18 +46,15 @@
                     //__on_marker_out: this.__on_marker_out.bind(this)
                 };
 
-                this._wrapper = document.createElement("div");
-                this._wrapper.setAttribute("class", "ll-map");
-
+                this.add_class("ll-map");
                 this.__init_back();
-
                 this.__init_leaflet();
             },
 
             __init_leaflet: function () {
                 this.__front = document.createElement("div");
                 this.__front.setAttribute("class", "ll-map-front");
-                this._wrapper.appendChild(this.__front);
+                this.__wrapper.appendChild(this.__front);
 
 
                 var myCRS = L.Util.extend({}, L.CRS, {
@@ -94,10 +91,9 @@
                     "crs": myCRS
                 });
 
-                this._wrapper.style.width = "100%";
-                this._wrapper.style.height = "100%";
-
-
+                //this.__wrapper.style.width = "100%";
+                //this.__wrapper.style.height = "100%";
+                this.add_class("fs");
 
                 this.__leaflet_map.on("viewreset", this.__on_map_zoom.bind(this));
             },
@@ -105,7 +101,7 @@
             __init_back: function () {
                 this.__back = document.createElement("div");
                 this.__back.setAttribute("class", "ll-map-back");
-                this._wrapper.appendChild(this.__back);
+                this.__wrapper.appendChild(this.__back);
 
                 this.__svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 this.__back.appendChild(this.__svg);
@@ -409,7 +405,7 @@
 
 
                     this.__leaflet_map.invalidateSize();
-                    this.__styles = getComputedStyle(this._wrapper);
+                    this.__styles = getComputedStyle(this.__wrapper);
                     var ratio_1 = Math.pow(2, (this.__leaflet_map._zoom - 10) / 2);
 
                     var marker_offset_x = m._opts.width / 2;
@@ -486,7 +482,7 @@
 
                 var p = this.lm().getBounds();
                 var center = p.getCenter();
-                this.__styles = getComputedStyle(this._wrapper);
+                this.__styles = getComputedStyle(this.__wrapper);
                 var width = parseInt(this.__styles.width) / 2;
                 var height = parseInt(this.__styles.height) / 2;
                 var ratio_1 = Math.pow(2, (this.lm()._zoom - 10) / 2);

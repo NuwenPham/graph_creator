@@ -52,12 +52,18 @@
                     return;
                 }
 
+                var arr = _id.split("?");
+                var clear_page_id = arr[0];
+                var query = arr[1];
+
+
+
                 var is_error_page = false;
-                if (!pages_map[_id]) {
-                    _id = this._opts.redirect_error_page;
+                if (!pages_map[clear_page_id]) {
+                    clear_page_id = this._opts.redirect_error_page;
                     is_error_page = true;
                 }
-                var _page = new pages_map[_id](_options);
+                var _page = new pages_map[clear_page_id](_options, query);
                 var elem = _page.wrapper();
 
                 //debugger;
