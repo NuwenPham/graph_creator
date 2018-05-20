@@ -115,7 +115,8 @@
                         coords: [a * 150, a * 10],
                         movable: true,
                         has_bonus: true,
-                        text: sys.name
+                        //text: sys.solar_system_id,
+                        text: sys.name,
                     });
 
                     var mid = this.__map.add_marker(m);

@@ -54,7 +54,6 @@
          dispatcher.on("new_connection", handshake_handler);
          _export.dispatcher = dispatcher;
 
-
         var before_open = function () {return false;};
 
         nav.on("before_open", before_open);

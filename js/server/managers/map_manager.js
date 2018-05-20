@@ -221,8 +221,8 @@ var Map = basic.inherit({
         while( a < this.__links_index_on_id.length){
             var lid = this.__links_index_on_id[a];
             var link = this.__links[lid];
-            var first_condition = link.solar_system_id_from() == _sol_sys_id_from && link.solar_system_id_from() == _sol_sys_id_to;
-            var second_condition = link.solar_system_id_from() == _sol_sys_id_to && link.solar_system_id_from() == _sol_sys_id_from;
+            var first_condition = link.solar_system_id_from() == _sol_sys_id_from && link.solar_system_id_to() == _sol_sys_id_to;
+            var second_condition = link.solar_system_id_from() == _sol_sys_id_to && link.solar_system_id_to() == _sol_sys_id_from;
 
             if(first_condition || second_condition){
                 return true;
@@ -364,7 +364,7 @@ var Map = basic.inherit({
             var char = user.get_char(info.name);
 
             var is_true_location = char.location() != -1 && info.location.solar_system_id;
-            var is_other_location = char.location() != info.location.solar_system_id
+            var is_other_location = char.location() != info.location.solar_system_id;
 
             if (is_other_location && is_true_location) {
                 console.log("LOCATION you: " + char.location() + ", loc in: " + info.location.solar_system_id);
@@ -515,16 +515,16 @@ var SolSystem = basic.inherit({
         var base = {
             id: -1,
             solar_system_id: -1, // location id
-            station_id: -1,
-            structure_id: -1
+            //station_id: -1,
+            //structure_id: -1
         };
         Object.extend(base, _options);
         basic.prototype.constructor.call(this, base);
 
         this.__id = base.id;
         this.__solar_system_id = base.solar_system_id;
-        this.__station_id = base.station_id;
-        this.__structure_id = base.structure_id;
+        //this.__station_id = base.station_id;
+        //this.__structure_id = base.structure_id;
 
         this.__init();
     },
@@ -534,18 +534,18 @@ var SolSystem = basic.inherit({
     solar_system_id: function () {
         return this.__solar_system_id;
     },
-    station_id: function () {
-        return this.__station_id;
-    },
-    structure_id: function () {
-        return this.__structure_id;
-    },
+    //station_id: function () {
+    //    return this.__station_id;
+    //},
+    //structure_id: function () {
+    //    return this.__structure_id;
+    //},
     save: function () {
         return {
             id: this.__id,
             solar_system_id: this.__solar_system_id,
-            station_id: this.__station_id,
-            structure_id: this.__structure_id
+            //station_id: this.__station_id,
+            //structure_id: this.__structure_id
         }
     },
     restore: function (_data) {
@@ -553,8 +553,8 @@ var SolSystem = basic.inherit({
 
         this.__id = _data.id;
         this.__solar_system_id = _data.solar_system_id;
-        this.__station_id = _data.station_id;
-        this.__structure_id = _data.structure_id;
+        //this.__station_id = _data.station_id;
+        //this.__structure_id = _data.structure_id;
 
         console.log("--- --- solar system [" + _data.solar_system_id + "] restoring END...");
     }
