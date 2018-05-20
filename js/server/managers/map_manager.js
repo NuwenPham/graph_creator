@@ -188,6 +188,7 @@ var Map = basic.inherit({
         this.__users.splice(index);
     },
     add_system: function (_solar_system_id, _station_id, _structure_id) {
+        console.log("!!!  WAS ADDED SYSTEM: [%s]", _solar_system_id);
         var sid = this.__systems_counter++;
         this.__systems[sid] = new SolSystem({
             id: sid,
@@ -362,7 +363,10 @@ var Map = basic.inherit({
             var user = ward.users().get_user_by_id(info.uid);
             var char = user.get_char(info.name);
 
-            if (char.location() != info.location.solar_system_id) {
+            var is_true_location = char.location() != -1 && info.location.solar_system_id;
+            var is_other_location = char.location() != info.location.solar_system_id
+
+            if (is_other_location && is_true_location) {
                 console.log("LOCATION you: " + char.location() + ", loc in: " + info.location.solar_system_id);
 
                 if (this.has_system(info.location.solar_system_id)) {
@@ -370,8 +374,8 @@ var Map = basic.inherit({
                         this.add_link(char.location(), info.location.solar_system_id);
                     }
                 } else {
-                    this.add_system(info.location.solar_system_id);
                     if (char.location() != -1) {
+                        this.add_system(info.location.solar_system_id);
                         this.add_link(char.location(), info.location.solar_system_id);
                     }
                 }

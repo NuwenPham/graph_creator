@@ -14,7 +14,6 @@
     var m_counter = 2;
     var l_counter = 2;
 
-
     var z_index_max = 2000;
     var z_index_min = 1000;
 
@@ -22,7 +21,6 @@
         var lay = require("js/client/ui/lay");
         var link = require("js/client/ui/ll/line");
         var marker = require("js/client/ui/ll/marker");
-
 
         var map = lay.inherit({
             constructor: function map(_options) {
@@ -35,7 +33,6 @@
                 this.__link_to_markers_attach_collection = {};
                 this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");
@@ -50,7 +47,6 @@
                 this.__init_back();
                 this.__init_leaflet();
             },
-
             __init_leaflet: function () {
                 this.__front = document.createElement("div");
                 this.__front.setAttribute("class", "ll-map-front");
@@ -97,7 +93,6 @@
 
                 this.__leaflet_map.on("viewreset", this.__on_map_zoom.bind(this));
             },
-
             __init_back: function () {
                 this.__back = document.createElement("div");
                 this.__back.setAttribute("class", "ll-map-back");
@@ -106,11 +101,9 @@
                 this.__svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 this.__back.appendChild(this.__svg);
             },
-
             lm: function () {
                 return this.__leaflet_map;
             },
-
             add_marker: function (_marker, _is_holder) {
                 var mid = m_counter++;
                 this.lm().addLayer(_marker.marker());
@@ -119,7 +112,6 @@
                     mousedown: this.__on_marker_down.bind(this, mid),
                     is_holder: _is_holder
                 };
-
 
                 _marker.__el.style["margin-top"] = 0;
                 _marker.__el.style["margin-left"] = 0;
@@ -134,7 +126,6 @@
                 _marker.dom().style.width = width + "px";
                 _marker.dom().style.height = height + "px";
                 _marker.dom().style.zIndex = z_index_max;
-
                 return mid;
             },
 
@@ -255,29 +246,21 @@
                     this.__current_marker = null;
                 }
             },
-
             __on_map_zoom: function (_event) {
-
-
                 this.update_all_markers();
                 this.update_all_links();
             },
-
             create_link: function (_mid) {
                 var l = new link();
                 var lid = this.add_link(l);
 
-                //debugger;
                 this.attach_link_to(lid, _mid, true);
                 this.attach_link_to(lid, _mid - 1, false);
 
                 this.update_marker_link(_mid);
                 this.update_marker_link(_mid - 1);
-
             },
-
             attach_link_to : function (_lid, _mid, _is_start) {
-
                 if(_lid === undefined){
                     //debugger;
                 }
@@ -296,13 +279,9 @@
                 } else {
                     this.__link_to_markers_attach_collection[_lid].end_mid = _mid;
                 }
-
             },
-
             detach_link_from: function (_lid, _mid) {
-
                 var links = this.__marker_on_link_attach_collection[_mid];
-
                 if(!links) return;
 
                 var a = 0;
@@ -324,17 +303,13 @@
                 if(end_mid !== undefined && end_mid == _mid){
                     delete attached_mids.end_mid;
                 }
-
             },
-
             get_marker: function (_mid) {
                 return this.__markers[_mid];
             },
-
             get_link: function (_lid) {
                 return this.__links[_lid];
             },
-
             update_all_markers: function () {
                 var markers = this.markers();
                 var ratio = Math.pow(2, (this.lm()._zoom - 10) / 2);
@@ -381,13 +356,11 @@
                 }
 
             },
-
             update_all_links: function () {
                 for(var k in this.__markers){
                     this.update_marker_link(k);
                 }
             },
-
             update_marker_link: function (_mid) {
                 var m = this.get_marker(_mid).instance;
                 var coords = m.marker().getLatLng();
@@ -423,10 +396,7 @@
 
                     a++;
                 }
-
-                //debugger;
             },
-
             __create_link_holder: function (_mid, _event) {
                 this.__holding_source_mid = _mid;
 
@@ -475,8 +445,6 @@
                 this.__add_to_all_markers_over();
                 return end_mid;
             },
-
-
             calculate_for_marker: function (_mid, _sx, _sy, _tw, _th) {
                 var m = this.get_marker(_mid).instance;
 
@@ -501,7 +469,6 @@
                     y: res_y
                 }
             },
-
             __add_to_all_markers_over: function(){
                 window.addEventListener("mouseup", this.__actions.__on_marker_up);
 
@@ -518,7 +485,6 @@
                     }
                 }
             },
-
             __remove_from_all_markers_over: function(){
                 window.addEventListener("mouseup", this.__actions.__on_marker_up);
 
@@ -532,9 +498,7 @@
                     }
                 }
             },
-
             __on_marker_over: function (_mid) {
-
                 if (_mid == this.__holding_source_mid) {
                     return;
                 }
@@ -543,27 +507,13 @@
                     return;
                 }
 
-                //
-                // if(!this.__is_over_on_marker){
-                //     this.__is_over_on_marker = true;
-                // }
-
                 this.__is_over_on_marker = true;
                 this.__overed_marker = _mid;
 
                 var data = this.get_marker(_mid);
 
                 console.log("over + [" + data.instance._opts.text + "]");
-
-                // debugger;
-                // var md = this.get_marker(_mid);
-                // debugger;
-                // md.instance.remove_class("my-div-icon");
-                // md.instance.add_class("my-div-icon-over");
-
-
             },
-
             __on_marker_out: function () {
                 if(this.__overed_marker) {
                     var data = this.get_marker(this.__overed_marker);
@@ -572,9 +522,7 @@
                 this.__is_over_on_marker = false;
                 delete this.__overed_marker;
             },
-
             __connect: function () {
-
                 this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
                 this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
 
@@ -589,22 +537,11 @@
                 this.remove_marker(this.__holding_start_mid);
                 this.remove_marker(this.__holding_end_mid);
 
-                //debugger;
                 this.__holding_start_mid = undefined;
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
                 this.__holding_source_mid = undefined;
-                //
-                //
-                // if(this.__current_marker) {
-                //     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
-                //     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
-                //     this.lm().dragging.enable();
-                //     this.__current_marker = null;
-                // }
-
             },
-
             __erase_holders: function () {
                 this.detach_link_from(this.__holding_lid, this.__holding_start_mid);
                 this.detach_link_from(this.__holding_lid, this.__holding_end_mid);
@@ -613,7 +550,6 @@
                 this.remove_marker(this.__holding_start_mid);
                 this.remove_marker(this.__holding_end_mid);
 
-                //debugger;
                 this.__holding_start_mid = undefined;
                 this.__holding_end_mid = undefined;
                 this.__holding_lid = undefined;
@@ -621,7 +557,6 @@
 
                 this.__remove_from_all_markers_over();
             },
-
             __erase_marker_data: function (_mid) {
                 var links = this.__marker_on_link_attach_collection[_mid];
 
@@ -639,7 +574,6 @@
 
                 this.remove_marker(_mid);
             },
-
             modify_z_index: function (_mid) {
                 var _m = this.get_marker(_mid).instance;
                 for(var k in this.__markers){
@@ -650,10 +584,7 @@
                     }
                 }
             }
-
         });
-
-
         return map;
     })
 })(window);

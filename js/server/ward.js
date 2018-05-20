@@ -5,6 +5,7 @@ var user_manager = require("./managers/user_manager.js");
 var map_manager = require("./managers/map_manager.js");
 var token_manager = require("./managers/token_manager.js");
 var data_manager = require("./managers/data_manager.js");
+var eve_static_data = require("./managers/eve_static_data.js");
 
 var ward = basic.inherit({
     constructor: function ward(_options) {
@@ -16,6 +17,7 @@ var ward = basic.inherit({
         basic.prototype.destructor.call(this);
     },
     __init: function () {
+        this.__init_eve_static_data();
         this.__init_data();
         this.__init_token_manager();
         this.__init_users();
@@ -24,6 +26,9 @@ var ward = basic.inherit({
         this.__init_dispatcher();
 
         this.restore();
+    },
+    __init_eve_static_data: function () {
+        this.__eve_static_data = new eve_static_data();
     },
     __init_data: function () {
         this.__data_manager = new data_manager();
@@ -64,6 +69,9 @@ var ward = basic.inherit({
     },
     db: function () {
         return this.__data_manager;
+    },
+    sde: function () {
+        return this.__eve_static_data;
     },
     save: function(){
         var data = this.__data_manager.data();

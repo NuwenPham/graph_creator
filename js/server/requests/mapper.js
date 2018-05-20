@@ -110,18 +110,6 @@ var mapper = {
 
         }
     },
-    locations: function (_data) {
-        var token_id = _data.event.token_id;
-        if (ward.tokens().check_token(token_id)) {
-            var t = ward.tokens().get_token(token_id);
-        }
-    },
-    links: function (_data) {
-        var token_id = _data.event.token_id;
-        if (ward.tokens().check_token(token_id)) {
-            var t = ward.tokens().get_token(token_id);
-        }
-    },
     topo: function (_data) {
         var token_id = _data.event.token_id;
         if (ward.tokens().check_token(token_id)) {
@@ -131,9 +119,20 @@ var mapper = {
             var systems = map.systems_data();
             var links = map.links_data();
 
+            var out_systems = [];
+            var a = 0;
+            while (a < systems.length) {
+                var os = systems[a];
+                out_systems.push({
+                    solar_system_id: os.solar_system_id,
+                    name: ward.sde().get_system(os.solar_system_id).name
+                });
+                a++;
+            }
+
             ward.dispatcher().send(_data.connection_id, _data.server_id, {
                 client_id: _data.client_id,
-                systems: systems,
+                systems: out_systems,
                 links: links,
                 success: true,
                 command_addr: ["response_maps"]
