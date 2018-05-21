@@ -9,7 +9,6 @@ var eve_static_data = basic.inherit({
         var options = {};
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
-
         this.__init();
     },
     __init: function () {

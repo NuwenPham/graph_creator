@@ -8,11 +8,8 @@
     ];
 
     load_css("css/input.css");
-
-
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
-
         var input = lay.inherit({
             constructor: function input(_options) {
                 var options = {
@@ -24,7 +21,6 @@
                 lay.prototype.constructor.call(this, options);
                 this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");

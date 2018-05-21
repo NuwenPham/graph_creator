@@ -9,54 +9,44 @@
         "js/client/ui/button",
         "js/client/ui/input"
     ];
-
     load_css("css/ccp_auth_page.css");
-
     define(name, libs, function () {
         var basic = require("js/basic");
         var button = require("js/client/ui/button");
         var input = require("js/client/ui/input");
 
-
         var ccp_auth_page = basic.inherit({
             constructor: function ccp_auth_page(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 basic.prototype.constructor.call(this, options);
                 this._pre_init();
             },
-
             destructor: function () {
                 this.__hello_box.destructor();
                 this.__btn_reg.destructor();
                 this.__btn_auth.destructor();
                 this.__hello_box_or.destructor();
+                basic.prototype.constructor.call(this);
             },
-
             _pre_init: function () {
                 this.__init_wrapper();
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
                 this.check_token();
             },
-
             _init: function () {
                 this.__init_content_box();
                 this.__init_btns();
             },
-
             __init_wrapper: function () {
                 this.__wrapper = document.createElement("div");
                 this.__wrapper.setAttribute("class", "page-hello-page centered-outer");
             },
-
             __init_content_box: function () {
                 this.__content_box = document.createElement("div");
                 this.__content_box.setAttribute("class", "reg-box-ccp centered-inner");
                 this.__wrapper.appendChild(this.__content_box);
             },
-
             __init_btns: function () {
                 this.__btn_submit = new button({
                     text: ""
@@ -66,11 +56,8 @@
                 this.__btn_submit.remove_class("ui-btn");
                 this.__btn_submit.add_class("ccp-button");
 
-
-
                 this.__btn_submit.add_event("click", this.__on_auth_click.bind(this));
             },
-
             __core_handler: function (_event) {
                 var data = _event.data;
                 var command = data.command_addr[data.command_addr.length - 1];
@@ -89,7 +76,6 @@
                         break;
                 }
             },
-
             __on_auth_click: function () {
                 var response_url = location.origin + location.pathname;
                 var data = {
@@ -112,7 +98,6 @@
                 console.log("CCP_AUTH_URL " + url);
                 location.href = url;
             },
-
             check_token: function () {
                 var token_id = sessionStorage.getItem("token");
 
@@ -121,7 +106,6 @@
                     token_id: token_id
                 });
             },
-
             wrapper: function(){
                 return this.__wrapper;
             }

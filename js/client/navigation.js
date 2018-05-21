@@ -10,15 +10,9 @@
         "js/basic",
         "js/client/pages_list"
     ];
-
-
-
-
     define(name, libs, function () {
         var basic = require("js/basic");
-
         var pages_map = require("js/client/pages_list");
-
         var navigation = basic.inherit({
             constructor: function navigation(_options) {
                 var options = {
@@ -29,7 +23,6 @@
 
                 this._init();
             },
-
             _init: function () {
                 document.body.style.width = "100%";
                 document.body.style.height = "100%";
@@ -45,18 +38,14 @@
                 window.addEventListener("hashchange", hashchange);
                 this._history = [];
             },
-
             open: function (_id, _options) {
                 var is_break = this.trigger("before_open");
                 if(is_break){
                     return;
                 }
-
                 var arr = _id.split("?");
                 var clear_page_id = arr[0];
                 var query = arr[1];
-
-
 
                 var is_error_page = false;
                 if (!pages_map[clear_page_id]) {
@@ -66,11 +55,8 @@
                 var _page = new pages_map[clear_page_id](_options, query);
                 var elem = _page.wrapper();
 
-                //debugger;
                 document.body.appendChild(elem);
-                //if (!_not_api_call || is_error_page) {
-                    window.location = "#" + _id;
-                //}
+                window.location = "#" + _id;
 
                 _page.afterInsert && _page.afterInsert();
 
@@ -78,7 +64,6 @@
                 this._last_child && document.body.removeChild(this._last_child);
                 this._last_child = elem;
             },
-
             parse_query: function () {
                 var query = location.search.slice(1);
                 var arr_args = query.split("&");
@@ -91,13 +76,11 @@
                 }
                 return res;
             },
-
             back: function(){
                 this._history.pop();
                 if(this._history.length != 0) this.open(this._history.pop());
             }
         });
-
         return navigation;
     })
 })(window);

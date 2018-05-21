@@ -15,14 +15,9 @@ var users = basic.inherit({
         this.__index_on_id = [];
         this.__mail_on_id = {};
         this.__count = 0;
-
-        this.__init();
     },
     destructor: function () {
         basic.prototype.destructor.call(this);
-    },
-    __init: function () {
-
     },
     add_user: function (_data) {
         var base = {
@@ -113,7 +108,6 @@ var users = basic.inherit({
     }
 });
 
-
 var User = basic.inherit({
     constructor: function User(_options) {
         var base = {
@@ -129,14 +123,9 @@ var User = basic.inherit({
         this.__mail = base.mail;
         this.__password = base.password;
         this.__characters = base.characters;
-        
-        this.__init();
     },
     destructor: function () {
         basic.prototype.destructor.call(this);
-    },
-    __init: function () {
-        
     },
     add_eve_char: function (_options) {
         var base = {
@@ -354,8 +343,5 @@ var EVEChar = basic.inherit({
         console.log("--- --- char: [" + _data.char_name + "] END restoring...");
     }
 });
-
-
-
 
 module.exports = users;

@@ -88,8 +88,7 @@
                     }.bind(this));
                     ro.request();
 
-                }.bind(this))
-
+                }.bind(this));
 
                 this.__go = new button({
                     text: "go!"

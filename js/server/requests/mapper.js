@@ -139,9 +139,7 @@ var mapper = {
             });
         }
     }
-
 };
-
 
 module.exports = {
     requests: {

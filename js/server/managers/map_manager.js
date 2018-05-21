@@ -20,9 +20,6 @@ var Maps = basic.inherit({
     destructor: function () {
         basic.prototype.destructor.call(this);
     },
-    __init: function () {
-
-    },
     add_map: function (_options) {
         var mid = this.__count++;
 
@@ -77,7 +74,6 @@ var Maps = basic.inherit({
     is_exist_by_name: function (_name) {
         return this.__name_on_id[_name] === undefined;
     },
-
     save: function () {
         var maps_res = {};
         for(var k in this.__maps){
@@ -110,7 +106,6 @@ var Maps = basic.inherit({
         }
         console.log("Maps manager restoring END...");
     }
-
 });
 
 var Map = basic.inherit({
@@ -154,13 +149,9 @@ var Map = basic.inherit({
         // not saving vars
         this.__poll_tid = -1;
         this.__is_polling = false;
-        this.__init();
     },
     destructor: function () {
         basic.prototype.destructor.call(this);
-    },
-    __init: function () {
-
     },
     start: function () {
         var TICK_TIME = 10000; //ms
@@ -479,11 +470,6 @@ var Link = basic.inherit({
         this.__id = base.id;
         this.__solar_system_id_from = base.solar_system_id_from;
         this.__solar_system_id_to = base.solar_system_id_to;
-
-        this.__init();
-    },
-    __init: function () {
-
     },
     solar_system_id_from: function () {
         return this.__solar_system_id_from;
@@ -514,38 +500,21 @@ var SolSystem = basic.inherit({
     constructor: function Map(_options) {
         var base = {
             id: -1,
-            solar_system_id: -1, // location id
-            //station_id: -1,
-            //structure_id: -1
+            solar_system_id: -1
         };
         Object.extend(base, _options);
         basic.prototype.constructor.call(this, base);
 
         this.__id = base.id;
         this.__solar_system_id = base.solar_system_id;
-        //this.__station_id = base.station_id;
-        //this.__structure_id = base.structure_id;
-
-        this.__init();
-    },
-    __init: function () {
-
     },
     solar_system_id: function () {
         return this.__solar_system_id;
     },
-    //station_id: function () {
-    //    return this.__station_id;
-    //},
-    //structure_id: function () {
-    //    return this.__structure_id;
-    //},
     save: function () {
         return {
             id: this.__id,
-            solar_system_id: this.__solar_system_id,
-            //station_id: this.__station_id,
-            //structure_id: this.__structure_id
+            solar_system_id: this.__solar_system_id
         }
     },
     restore: function (_data) {
@@ -553,8 +522,6 @@ var SolSystem = basic.inherit({
 
         this.__id = _data.id;
         this.__solar_system_id = _data.solar_system_id;
-        //this.__station_id = _data.station_id;
-        //this.__structure_id = _data.structure_id;
 
         console.log("--- --- solar system [" + _data.solar_system_id + "] restoring END...");
     }

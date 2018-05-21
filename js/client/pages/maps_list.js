@@ -41,11 +41,9 @@
                 Object.extend(options, _options);
                 page.prototype.constructor.call(this, options);
             },
-
             destructor: function () {
                 page.prototype.destructor.call(this);
             },
-
             _after_init: function () {
                 page.prototype._after_init.call(this);
                 this.__init_content();

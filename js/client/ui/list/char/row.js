@@ -12,8 +12,6 @@
     ];
 
     load_css("css/list/char/row.css");
-
-
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
         var row = require("js/client/ui/list/row");

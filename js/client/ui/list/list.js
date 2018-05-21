@@ -8,8 +8,6 @@
     ];
 
     load_css("css/list/list.css");
-
-
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
 
@@ -22,7 +20,6 @@
                 lay.prototype.constructor.call(this, base);
                 //this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");

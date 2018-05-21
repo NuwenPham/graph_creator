@@ -52,7 +52,6 @@
                 this.__front.setAttribute("class", "ll-map-front");
                 this.__wrapper.appendChild(this.__front);
 
-
                 var myCRS = L.Util.extend({}, L.CRS, {
                     "projection": {
                         "project": function (_latlng) {
@@ -128,7 +127,6 @@
                 _marker.dom().style.zIndex = z_index_max;
                 return mid;
             },
-
             add_link: function (_link) {
                 var lid = l_counter++;
                 this.lm().addLayer(_link.marker());
@@ -137,7 +135,6 @@
                 };
                 return lid;
             },
-
             remove_link: function (_lid) {
                 var data = this.__links[_lid];
                 if(data){
@@ -145,7 +142,6 @@
                     delete this.__links[_lid];
                 }
             },
-
             remove_marker: function (_mid) {
                 var marker = this.__markers[_mid];
                 if(marker){
@@ -160,11 +156,9 @@
                 this.lm().removeLayer(marker.instance.marker());
                 delete this.__markers[_mid];
             },
-
             markers: function () {
                 return this.__markers;
             },
-
             __on_marker_down: function (_mid, _event) {
                 this.modify_z_index(_mid);
 
@@ -201,21 +195,15 @@
                     window.addEventListener("mousemove", this.__actions.__on_marker_move);
                     window.addEventListener("mouseup", this.__actions.__on_marker_up);
                 }
-
             },
-
             __on_marker_move: function (_event) {
                 if(this.__current_marker) {
                     var _marker = this.get_marker(this.__current_marker).instance.marker();
                     var _map = this.lm();
                     var mouse_coords = new L.Point(_event.clientX, _event.clientY);
-
-
-
                     if(  this.get_marker(this.__current_marker).instance._opts.text == ""){
                         // да да это тяжелая наркомания
                         //debugger;
-
                         mouse_coords = new L.Point(_event.clientX + 10, _event.clientY+ 10);
                     }
 
@@ -227,18 +215,13 @@
                     this.update_marker_link(this.__current_marker);
                 }
             },
-
             __on_marker_up: function (_event) {
                 if(this.__is_over_on_marker && this.__holding_start_mid){
                     this.__connect();
-
-
                 }
-                //
                 if(this.__holding_start_mid) {
                     this.__erase_holders();
                 }
-
                 if(this.__current_marker) {
                     window.removeEventListener("mousemove", this.__actions.__on_marker_move);
                     window.removeEventListener("mouseup", this.__actions.__on_marker_up);
@@ -351,10 +334,8 @@
                         mrk.__head_el_bonus.style.width = bw + "px";
                         mrk.__head_el_bonus.style.height = bh + "px";
                         mrk.__head_el_bonus.style.margin = margin + "px " + margin + "px 0px 0px";
-
                     }
                 }
-
             },
             update_all_links: function () {
                 for(var k in this.__markers){
@@ -366,16 +347,13 @@
                 var coords = m.marker().getLatLng();
 
                 var links = this.__marker_on_link_attach_collection[_mid];
-
                 if(!links) return;
 
                 var a = 0;
                 while (a < links.length) {
                     var lid = links[a].lid;
                     var is_start = links[a].is_start;
-
                     var ldata = this.get_link(lid);
-
 
                     this.__leaflet_map.invalidateSize();
                     this.__styles = getComputedStyle(this.__wrapper);
@@ -390,10 +368,8 @@
                     var res_y = y;
 
                     ldata.instance.__line.setAttribute("stroke-width", 2 * ratio_1 );
-
                     ldata.instance[(is_start ? "set_start" : "set_end")](res_x, res_y);
                     ldata.instance.__svg.style.overflow = "initial";
-
                     a++;
                 }
             },
@@ -402,12 +378,10 @@
 
                 var m = this.get_marker(_mid).instance;
                 var sc = m.marker().getLatLng();
-                //var coords = this.calculate_for_marker(_mid, sc., _event.clientY);
 
                 var holder_width = 10;
                 var holder_height = 10;
 
-                //debugger;
                 var start_m = new marker({
                     width: holder_width,
                     height: holder_height,
@@ -436,7 +410,6 @@
 
                 this.update_marker_link(start_mid);
                 this.update_marker_link(end_mid);
-
 
                 this.__holding_start_mid = start_mid;
                 this.__holding_end_mid = end_mid;
@@ -471,7 +444,6 @@
             },
             __add_to_all_markers_over: function(){
                 window.addEventListener("mouseup", this.__actions.__on_marker_up);
-
                 for(var k in this.__markers){
                     var data = this.__markers[k];
                     if(data.instance.is_movable()) {
@@ -511,7 +483,6 @@
                 this.__overed_marker = _mid;
 
                 var data = this.get_marker(_mid);
-
                 console.log("over + [" + data.instance._opts.text + "]");
             },
             __on_marker_out: function () {
@@ -559,7 +530,6 @@
             },
             __erase_marker_data: function (_mid) {
                 var links = this.__marker_on_link_attach_collection[_mid];
-
                 if(links) {
                     while (links.length > 0) {
                         var lid = links[links.length - 1].lid;
@@ -571,7 +541,6 @@
                         this.remove_link(lid);
                     }
                 }
-
                 this.remove_marker(_mid);
             },
             modify_z_index: function (_mid) {

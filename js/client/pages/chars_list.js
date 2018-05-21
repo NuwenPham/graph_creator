@@ -17,33 +17,24 @@
     ];
 
     load_css("css/pages/chars_list.css");
-
     define(name, libs, function () {
         var page = require("js/client/pages/page");
         var lay = require("js/client/ui/lay");
         var list = require("js/client/ui/list/list");
         var row = require("js/client/ui/list/row");
-
         var button = require("js/client/ui/button");
         var request_characters = require("js/client/requests/api/user/characters");
         var char_row = require("js/client/ui/list/char/row");
 
-
-
-
         var chars_list = page.inherit({
             constructor: function chars_list(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 page.prototype.constructor.call(this, options);
             },
-
             destructor: function () {
                 page.prototype.destructor.call(this);
             },
-
             _after_init: function () {
                 page.prototype._after_init.call(this);
                 this.__init_content();

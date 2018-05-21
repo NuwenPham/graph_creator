@@ -9,40 +9,27 @@
         "js/client/ui/button",
         "js/client/ui/input"
     ];
-
     load_css("css/ccp_auth_page.css");
-
     define(name, libs, function () {
         var basic = require("js/basic");
         var button = require("js/client/ui/button");
         var input = require("js/client/ui/input");
-
-
         var ccp_auth_response = basic.inherit({
             constructor: function ccp_auth_response(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 basic.prototype.constructor.call(this, options);
                 this._pre_init();
             },
-
-            destructor: function () {
-
-            },
-
             _pre_init: function () {
                 this.__init_wrapper();
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
                 this.check_token();
             },
-
             __init_wrapper: function () {
                 this.__wrapper = document.createElement("div");
                 this.__wrapper.setAttribute("class", "page-hello-page centered-outer");
             },
-
             _init: function () {
                 var code = sessionStorage.getItem("code");
                 if(!code){
@@ -57,7 +44,6 @@
                     token_id: sessionStorage.getItem("token")
                 });
             },
-
             __core_handler: function (_event) {
                 var data = _event.data;
                 var command = data.command_addr[data.command_addr.length - 1];
@@ -94,8 +80,6 @@
                         break;
                 }
             },
-
-
             check_token: function () {
                 var token_id = sessionStorage.getItem("token");
                 dispatcher.send(this._client_id, {
@@ -103,7 +87,6 @@
                     token_id: token_id
                 });
             },
-
             wrapper: function(){
                 return this.__wrapper;
             }

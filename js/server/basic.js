@@ -5,19 +5,11 @@
 require("./baseClass");
 
 var basic = global.window.Base.inherit({
-
-    constructor: function(_opt){
-        this._opts = Object.extend({
-
-        }, _opt);
-
+    constructor: function (_opt) {
+        this._opts = Object.extend({}, _opt);
+        Base.prototype.constructor.call(this, _opt);
         this._events = [];
     },
-
-    destructor: function () {
-
-    },
-
     on: function (_eventName, _callback, _context) {
         if (_eventName == undefined || _callback == undefined)
             return false;
@@ -33,7 +25,6 @@ var basic = global.window.Base.inherit({
         this._events.push(lEvent);
         return true;
     },
-
     off: function (_eventName, _callback) {
         var a = 0;
         if (_eventName == undefined)
@@ -52,7 +43,6 @@ var basic = global.window.Base.inherit({
             a++;
         }
     },
-
     trigger: function (_eventName, _params) {
         var a = 0;
         if (this._events) {
@@ -60,18 +50,17 @@ var basic = global.window.Base.inherit({
                 if (this._events[a].name == _eventName)
                     if (_params != undefined) {
                         if (this._events[a].context != undefined) {
-                            this._events[a].callback.call(this._events[a].context, _params);
+                            return this._events[a].callback.call(this._events[a].context, _params);
                         } else {
-                            this._events[a].callback.call(this, _params);
+                            return this._events[a].callback.call(this, _params);
                         }
                     } else {
-                        this._events[a].callback.call(this);
+                        return this._events[a].callback.call(this);
                     }
                 a++;
             }
         }
     }
-
 });
 
 module.exports = basic;

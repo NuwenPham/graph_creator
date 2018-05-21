@@ -15,7 +15,6 @@ var connector = basic.inherit({
         basic.prototype.constructor.call(this, options);
         this._init();
     },
-
     _init: function () {
         this._port = this._opts.port;
 
@@ -24,7 +23,6 @@ var connector = basic.inherit({
 
         this.create_socket();
     },
-
     create_socket: function () {
         this._server = http.createServer(function(request, response) {
             // хз че тут
@@ -38,21 +36,18 @@ var connector = basic.inherit({
 
         this._wsServer.on('request', this._on_request.bind(this));
     },
-
     _on_close: function(_connection_id, _connection){
         // член
         console.log("close CHLEN:\n");
         this.trigger("closed", {reason: "clen"});
         delete this._connections[_connection_id];
     },
-
     _on_message: function(_connection_id, _message){
         if (_message.type === 'utf8') {
              console.log("IN:\n" + _message.utf8Data.toString());
             this.trigger("data", JSON.parse(_message.utf8Data));
         }
     },
-
     _on_request: function(_request){
         var connection = _request.accept(null, _request.origin);
 
@@ -61,11 +56,8 @@ var connector = basic.inherit({
         connection.on('close', this._on_close.bind(this, this._counter));
         this._connections[this._counter] = connection;
 
-        //debugger;
         this.trigger("new_connection",  this._counter++ );
-
     },
-
     send: function(_connection_id, _data) {
         var connection = this._connections[_connection_id];
         if (!connection) {
@@ -75,7 +67,6 @@ var connector = basic.inherit({
         var str = JSON.stringify(_data);
         console.log("OUT:\n" + str);
 
-        //debugger;
         var send = function () {
             try {
                 connection.send(str);

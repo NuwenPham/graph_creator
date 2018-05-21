@@ -8,8 +8,6 @@
     ];
 
     load_css("css/marker.css");
-
-
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
 
@@ -36,19 +34,15 @@
                 lay.prototype.constructor.call(this, options);
                 this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");
                 this.__init_marker();
-
                 this.__events();
             },
-
             __init_marker: function () {
                 var el = this.__el = this._wrapper = document.createElement("div");
                 el.setAttribute("class", "my-div-icon");
-
                 this.__icon = new L.DomMarkers.icon({
                     element : el,
                     iconSize: [this._opts.width, this._opts.height],
@@ -59,13 +53,10 @@
                     "icon": this.__icon
                 });
 
-                // this.__el.innerText = "sadf";
                 this.__el.style.fontSize = this._opts.font_size + "px";
                 this.__el.title = "C5 / J144420";
-
                 this.__head();
             },
-
             __head: function () {
                 if(this._opts.has_bonus) {
                     this.__head_el_bonus = document.createElement("div");
@@ -78,26 +69,20 @@
                 this.__head_el_right.setAttribute("class", "my-div-icon-head-right");
                 this.__head_el_right.innerText = this._opts.text;
             },
-
             __events: function () {
                 this.__el.addEventListener("mousedown", function (_event) {
-
                     this.trigger("mousedown", _event);
                 }.bind(this));
             },
-
             marker: function () {
                 return this.__marker;
             },
-
             icon: function () {
                 return this.__icon;
             },
-
             dom: function () {
                 return this.__el;
             },
-
             is_movable: function () {
                 return this._opts.movable;
             }

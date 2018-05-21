@@ -4,219 +4,108 @@
 
 var window = global.window = Object.create(null);
 
-var cl = function () {
-};
-
-cl.inherit = function (proto) {
+var common_class = function () {};
+common_class.inherit = function (_class) {
 	var that = this;
-	var lBase = function () {
-	};
-	var lMember, lFn, lSubclass;
-
-	lSubclass = proto && proto.init || proto.constructor ? proto.init || proto.constructor : function () {
+	var base = function () {};
+	var newclass = _class && _class.constructor ? proto.constructor : function () {
 		that.apply(this, arguments);
 	};
 
-	lBase.prototype = that.prototype;
-	lFn = lSubclass.fn = lSubclass.prototype = new lBase();
+	base.prototype = this.prototype;
+	var fn = newclass.prototype = new base();
 
-	for (lMember in proto) {
-		if (typeof proto[lMember] === "object" && !(proto[lMember] instanceof Array) && proto[lMember] !== undefined) {
-			// Merge object members
-			lFn[lMember] = Object.extend(true, {}, lBase.prototype[lMember], proto[lMember]);
+	for (var k in _class) {
+		if (typeof _class[k] === "object" && !(_class[k] instanceof Array) && _class[k] !== undefined) {
+			fn[k] = Object.extend(true, {}, base.prototype[k], proto[k]);
 		} else {
-			lFn[lMember] = proto[lMember];
+			fn[k] = _class[k];
 		}
 	}
 
-	for (var method in that) {
-		if (that.hasOwnProperty(method) && that[method] instanceof Function) {
-			lSubclass[method] = that[method]
+	for (var method in this) {
+		if (this.hasOwnProperty(method) && this[method] instanceof Function) {
+			newclass[method] = this[method]
 		}
 	}
 
-	lFn.constructor = lSubclass;
-	lSubclass.inherit = that.inherit;
-
-	return lSubclass;
+	fn.constructor = newclass;
+	newclass.inherit = this.inherit;
+	return newclass;
 };
 
-window.Base = cl.inherit({
-	"constructor": function () {
-		var that = this;
-
-		if (!(that instanceof cl)) {
-			throw new SyntaxError("Didn't call \"new\" operator");
+window.Base = common_class.inherit({
+	constructor: function () {
+		if (!(this instanceof common_class)) {
+			throw new Error("new not found");
 		}
-
-		cl.call(that);
-		that.uncyclic = [];
+		common_class.call(this);
+		this.uncyclic = [];
 	},
-	"destructor": function () {
-		var that = this;
-		var lIndex, lKey;
-
-		for (lIndex = 0; lIndex < that.uncyclic.length; ++lIndex) {
-			that.uncyclic[lIndex].call();
+	destructor: function () {
+		for (var i = 0; i < this.uncyclic.length; ++i) {
+			this.uncyclic[i].call();
 		}
-
-		for (lKey in that) {
-			if (that.hasOwnProperty(lKey)) {
-				that[lKey] = undefined;
-				delete that[lKey];
+		for (var k in this) {
+			if (this.hasOwnProperty(k)) {
+				this[k] = undefined;
+				delete this[k];
 			}
 		}
 	}
 });
 
-
-
 Object.extend = function () {
-	var lTarget = arguments[0] || {};
-	var lIndex = 1;
-	var lLength = arguments.length;
-	var lDeep = false;
-	var lOptions, lName, lSrc, lCopy, lCopyIsArray, lClone;
+	var target = arguments[0] || {};
+	var index = 1;
+	var length = arguments.length;
+	var deep = false;
 
-	if (typeof lTarget === "boolean") {
-		lDeep = lTarget;
-		lTarget = arguments[1] || {};
-		lIndex = 2;
+	if (typeof target === "boolean") {
+		deep = target;
+		target = arguments[1] || {};
+		index = 2;
 	}
 
-	if (typeof lTarget !== "object" && typeof lTarget != "function") {
-		lTarget = {};
+	if (typeof target !== "object" && typeof target != "function") {
+		target = {};
 	}
 
-	if (lLength === lIndex) {
-		lTarget = this;
-		--lIndex;
+	if (length === index) {
+		target = this;
+		--index;
 	}
 
-	for (; lIndex < lLength; lIndex++) {
-		if ((lOptions = arguments[lIndex]) != undefined) {
-			for (lName in lOptions) {
-				lSrc = lTarget[lName];
-				lCopy = lOptions[lName];
+	var options, src, copy, is_arr, clone;
+	for (; index < length; index++) {
+		if ((options = arguments[index]) != undefined) {
+			for (var name in options) {
+				src = target[name];
+				copy = options[name];
 
-				if (lTarget === lCopy) {
+				if (target === copy) {
 					continue;
 				}
 
-				if (lDeep && lCopy && (Object.isObject(lCopy) || (lCopyIsArray = Array.isArray(lCopy)))) {
-					if (lCopyIsArray) {
-						lCopyIsArray = false;
-						lClone = lSrc && Array.isArray(lSrc) ? lSrc : [];
+				if (deep && copy && (Object.isObject(copy) || (is_arr = Array.isArray(copy)))) {
+					if (is_arr) {
+						is_arr = false;
+						clone = src && Array.isArray(src) ? src : [];
 
 					} else {
-						lClone = lSrc && Object.isObject(lSrc) ? lSrc : {};
+						clone = src && Object.isObject(src) ? src : {};
 					}
 
-					lTarget[lName] = Object.extend(lDeep, lClone, lCopy);
-
-					// Don't bring in undefined values
+					target[name] = Object.extend(deep, clone, copy);
 				} else {
-					if (lCopy !== undefined) {
-						lTarget[lName] = lCopy;
+					if (copy !== undefined) {
+						target[name] = copy;
 					}
 				}
 			}
 		}
 	}
-	return lTarget;
-};
-
-Array.prototype.merge = function(_mergedArr) {
-	var a = 0;
-	if ( _mergedArr == undefined ) return this;
-	while ( a < _mergedArr.length ) {
-		this.push(_mergedArr[a]);
-		a++;
-	}
-};
-
-var print_r = function(_object, _options) {
-	var lKey, lSpaces = "   ", lSpacesLevel = "", lSpacesPreLevel = "";
-	var lDeepnes = "", lType = "", lView = "";
-
-	if ( _options == undefined ) {
-		_options = {
-			level : 1,
-			isStop : false,
-			maxLevel : 4,
-			isShowDeepnes : false,
-			isShowType : true
-		}
-	} else {
-		_options.level++;
-	}
-
-	if ( _options.level == _options.maxLevel )
-		_options.isStop = true;
-
-	var a = 0;
-	while ( a++ < _options.level )
-		lSpacesLevel += lSpaces;
-
-	a = 0;
-	while ( a++ < _options.level - 1 )
-		lSpacesPreLevel += lSpaces;
-
-	if ( _object == undefined ) {
-		console.log(lSpacesPreLevel + "{");
-		console.log(lSpacesLevel);
-		console.log(lSpacesPreLevel + "}");
-		_options.isStop = false;
-		_options.level--;
-		return;
-	}
-
-	console.log(lSpacesPreLevel + "{");
-	for ( lKey in _object ) {
-		if ( typeof _object[lKey] == "object" ) {
-
-			if ( _options.isShowDeepnes )
-				lDeepnes = "(deepnes: " + _options.level + ") ";
-
-			if ( _options.isShowType )
-				lType = "[" + typeof _object[lKey] + "] ";
-
-			lView = "\"" + lKey + "\" : ";
-
-			if ( _object[lKey] == undefined ) {
-				lView += "undefined,";
-				console.log(lSpacesLevel + lDeepnes + lType + lView);
-			} else {
-				console.log(lSpacesLevel + lDeepnes + lType + lView + (_options.isStop ? "{ ... }" : ""));
-				if ( !_options.isStop ) {
-					print_r(_object[lKey], _options)
-				}
-
-			}
-		} else {
-			if ( typeof _object[lKey] == "function" ) {
-				lType = "";
-
-				if ( _options.isShowType )
-					lType = "[" + typeof _object[lKey] + "] ";
-
-				console.log(lSpacesLevel + lType + lKey + " : function(){ ... }");
-			} else {
-				lType = "";
-				lView = "";
-
-				if ( _options.isShowType )
-					lType = "[" + typeof _object[lKey] + "] ";
-
-				lView = "\"" + lKey + "\" : " + (_object[lKey] ? _object[lKey] : "undefined") + ",";
-
-				console.log(lSpacesLevel + lType + lView);
-			}
-		}
-	}
-	console.log(lSpacesPreLevel + "},");
-	_options.isStop = false;
-	_options.level--;
+	return target;
 };
 
 Object.cookie = function(name, value, options) {
@@ -259,4 +148,13 @@ Object.cookieRemove = function (name) {
 	Object.cookie(name, "", {
 		expires: -1
 	})
+};
+
+
+window.load_css = function loadCss(url) {
+	var link = document.createElement("link");
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	link.href = url;
+	document.getElementsByTagName("head")[0].appendChild(link);
 };

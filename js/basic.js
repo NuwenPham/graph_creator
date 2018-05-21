@@ -1,23 +1,18 @@
 /**
  * Created by Cubla on 07.08.2017.
  */
-(function(_export){
+(function(_export) {
     var name = "js/basic";
     var libs = [
         "js/baseClass"
     ];
-    define( name, libs, function(){
-
+    define(name, libs, function () {
         return Base.inherit({
-
-            constructor: function(_opt){
-                this._opts = Object.extend({
-
-                }, _opt);
-
+            constructor: function (_opt) {
+                this._opts = Object.extend({}, _opt);
+                Base.prototype.constructor.call(this, _opt);
                 this._events = [];
             },
-
             on: function (_eventName, _callback, _context) {
                 if (_eventName == undefined || _callback == undefined)
                     return false;
@@ -33,7 +28,6 @@
                 this._events.push(lEvent);
                 return true;
             },
-
             off: function (_eventName, _callback) {
                 var a = 0;
                 if (_eventName == undefined)
@@ -52,7 +46,6 @@
                     a++;
                 }
             },
-
             trigger: function (_eventName, _params) {
                 var a = 0;
                 if (this._events) {
@@ -71,7 +64,6 @@
                     }
                 }
             }
-
         });
     });
 })(window);

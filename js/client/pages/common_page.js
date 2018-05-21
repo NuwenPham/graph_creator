@@ -21,23 +21,17 @@
         var lay = require("js/client/ui/lay");
         var list = require("js/client/ui/list/list");
         var row = require("js/client/ui/list/row");
-
         var button = require("js/client/ui/button");
-
 
         var common_page = page.inherit({
             constructor: function common_page(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 page.prototype.constructor.call(this, options);
             },
-
             destructor: function () {
                 page.prototype.destructor.call(this);
             },
-
             _after_init: function () {
                 page.prototype._after_init.call(this);
 
@@ -92,7 +86,6 @@
                 return btn;
             }
         });
-
         return common_page;
     })
 })(window);

@@ -21,8 +21,6 @@
                     height: 0
                 };
                 Object.extend(options, _options);
-
-
                 this.__x1 = 0;
                 this.__y1 = 0;
                 this.__x2 = 0;
@@ -33,7 +31,6 @@
                 lay.prototype.constructor.call(this, options);
                 this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");
@@ -41,7 +38,6 @@
                 this.__init_line();
                 this.__events();
             },
-
             __init_marker: function () {
                 var el = this.__el = document.createElement("div");
 
@@ -59,8 +55,6 @@
                 });
                 this.__svg.setAttribute("viewBox", "0 0 " + this.__size_x + " " + this.__size_y);
 
-
-                //
                 //this.__svg.style.overflow = "initial";
                 this.__svg.style.width = this.__size_x + "px";
                 this.__svg.style.height = this.__size_y + "px";
@@ -68,7 +62,6 @@
                 this.__svg.style.left = -(this.__size_x / 2) + "px";
                 this.__svg.style.top = -(this.__size_y / 2) + "px";
             },
-
             __init_line: function () {
                 this.__line = document.createElementNS("http://www.w3.org/2000/svg", "line")
                 this.__line.setAttribute("x1", 0);
@@ -80,13 +73,11 @@
 
                 this.__svg.appendChild(this.__line);
             },
-
             __events: function () {
                 //this.__el.addEventListener("mousedown", function (_event) {
                 //    this.trigger("mousedown", _event);
                 //}.bind(this));
             },
-
             marker: function () {
                 return this.__marker;
             },
@@ -94,15 +85,12 @@
             icon: function () {
                 return this.__icon;
             },
-
             dom: function () {
                 return this.__el;
             },
-
             is_movable: function () {
                 return this._opts.movable;
             },
-
             set_start: function (x, y) {
                 this.__line.setAttribute("x1", x + this.__size_x / 2);
                 this.__line.setAttribute("y1", y + this.__size_y / 2);
@@ -110,7 +98,6 @@
                 this.__y1 = y;
                 this.__calc_icon();
             },
-
             set_end: function (x, y) {
                 this.__line.setAttribute("x2", x + this.__size_x / 2);
                 this.__line.setAttribute("y2", y + this.__size_y / 2);
@@ -118,15 +105,12 @@
                 this.__y2 = y;
                 this.__calc_icon();
             },
-
             left_top: function () {
 
             },
-
             right_bottom: function () {
 
             },
-            
             __calc_icon: function () {
                 ////debugger;
                 //var min_x = Math.min(this.__x1, this.__x2);

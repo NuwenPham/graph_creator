@@ -9,8 +9,6 @@ var database = basic.inherit({
         var options = {};
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
-
-        this.__ward = options.ward;
         this.__init();
     },
     __init: function () {
@@ -32,7 +30,6 @@ var database = basic.inherit({
         fs.writeFileSync("db.json", JSON.stringify(this.__data, true, 3), "utf8");
         console.log("db saved");
     }
-
 });
 
 

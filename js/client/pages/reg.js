@@ -15,50 +15,33 @@
         var input = require("js/client/ui/input");
         var lay = require("js/client/ui/lay");
 
-
         var hello_page = basic.inherit({
             constructor: function hello_page(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 basic.prototype.constructor.call(this, options);
                 this._init();
             },
-
-            destructor: function () {
-
-            },
-
             _init: function () {
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
-
                 this.__init_wrapper();
                 this.__init_content_box();
                 this.__init_btns();
             },
-
             __init_wrapper: function () {
                 this.__wrapper = document.createElement("div");
                 this.__wrapper.setAttribute("class", "reg-page centered-outer");
             },
-
             __init_content_box: function () {
                 this.__content_box = document.createElement("div");
                 this.__content_box.setAttribute("class", "reg-box centered-inner");
                 this.__wrapper.appendChild(this.__content_box);
             },
-
             __init_btns: function () {
                 this.__mail = new input({
                     placeholder: "mail"
                 });
                 this.__content_box.appendChild(this.__mail.wrapper());
-
-                //this.__nick = new input({
-                //    placeholder: "nick"
-                //});
-                //this.__content_box.appendChild(this.__nick.wrapper());
 
                 this.__password = new input({
                     placeholder: "password"
@@ -82,13 +65,11 @@
 
                 this.__btn_submit.add_event("click", this.__on_auth_click.bind(this));
 
-
                 this.__error_lay = new lay();
                 this.__content_box.appendChild(this.__error_lay.wrapper());
                 this.__error_lay.remove_class("ui-lay");
                 this.__error_lay.add_class("log_lay");
             },
-
             __on_auth_click: function () {
                 var mail = this.__mail.value();
                 var pass_1 = this.__password.value();
@@ -104,9 +85,7 @@
                 } else {
                     this.__error_lay.inner_text("wrong data");
                 }
-
             },
-
             __core_handler: function (_event) {
                 var data = _event.data;
                 var command = data.command_addr[data.command_addr.length - 1];
@@ -157,7 +136,6 @@
                 }
                 //debugger;
             },
-
             wrapper: function(){
                 return this.__wrapper;
             }

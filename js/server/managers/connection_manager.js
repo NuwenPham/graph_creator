@@ -13,27 +13,18 @@ var connection_manager = basic.inherit({
         this.__connections = {};
         this.__init();
     },
-
     destructor: function () {
         basic.prototype.destructor.call(this);
     },
-
-    __init: function () {
-
-    },
-
     add: function (_connection_id, _value) {
         this.__connections[_connection_id] = _value || Object.create(null);
     },
-
     get: function (_connection_id) {
         return this.__connections[_connection_id];
     },
-
     is_exist: function (_connection_id) {
         return this.__connections[_connection_id] !== undefined;
     },
-
     remove: function (_connection_id) {
         delete this.__connections[_connection_id];
     }

@@ -10,14 +10,11 @@ var tokens = basic.inherit({
         Object.extend(options, _options);
         basic.prototype.constructor.call(this, options);
         this.__tokens = {};
-        this.__uid_on_token = {}
-        this.__ward = options.ward;
+        this.__uid_on_token = {};
     },
-
     destructor: function () {
         basic.prototype.destructor.call(this);
     },
-    
     create_token: function (_user_id, _expire_time) {
         var expire_time = _expire_time || (1000 * 60 * 60 * 24);
 
@@ -31,21 +28,17 @@ var tokens = basic.inherit({
         ward.save();
         return token_id;
     },
-
     get_token: function (_token_id) {
         return this.__tokens[_token_id];
     },
-
     check_token: function (_token_id) {
         return this.__tokens[_token_id] != undefined;
     },
-
     remove_token: function (_token_id) {
         var uid = this.__tokens[_token_id].user_id;
         delete this.__uid_on_token[uid];
         delete this.__tokens[_token_id];
     },
-
     refresh_token: function(_token_id, _expire_time){
         var expire_time = _expire_time || (1000 * 60 * 60 * 24);
         this.__tokens[_token_id].expire_time = +new Date + expire_time;
@@ -282,7 +275,4 @@ var MD5 = function(s) {
     var i = B(Y) + B(X) + B(W) + B(V);
     return i.toLowerCase()
 };
-
-
-
 module.exports = tokens;

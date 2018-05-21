@@ -8,21 +8,16 @@
     ];
 
     load_css("css/list/row.css");
-
-
     define(name, libs, function () {
         var lay = require("js/client/ui/lay");
 
         var list = lay.inherit({
             constructor: function input(_options) {
-                var base = {
-
-                };
+                var base = {};
                 Object.extend(base, _options);
                 lay.prototype.constructor.call(this, base);
                 this._init();
             },
-
             _init: function () {
                 lay.prototype._init.call(this);
                 this.remove_class("ui-lay");

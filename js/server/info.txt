@@ -1,4 +1,3 @@
 <server_path>/js/server
 npm install websocket
-npm install level
 npm install request

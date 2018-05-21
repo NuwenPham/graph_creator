@@ -22,17 +22,10 @@
         var navigation = require("js/client/navigation");
         v.point = point;
 
-
          var d = require("js/client/dispatcher");
          var dispatcher = new d();
 
         _export.nav = new navigation();
-
-
-        //_export.nav = new navigation();
-        //var page = location.hash !== undefined && (location.hash).slice(1);
-        //_export.nav.open( page || "hello_page" );
-
          var handshake_handler = function (_data) {
 
              _export.server = Object.create(null);

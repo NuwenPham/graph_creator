@@ -12,12 +12,9 @@
     ];
 
     load_css("css/hello_page.css");
-
     define(name, libs, function () {
         var basic = require("js/basic");
         var button = require("js/client/ui/button");
-
-
         var hello_page = basic.inherit({
             constructor: function hello_page(_options) {
                 var options = {
@@ -27,31 +24,26 @@
                 basic.prototype.constructor.call(this, options);
                 this._init();
             },
-
             destructor: function () {
                 this.__hello_box.destructor();
                 this.__btn_reg.destructor();
                 this.__btn_auth.destructor();
                 this.__hello_box_or.destructor();
             },
-
             _init: function () {
                 this.__init_wrapper();
                 this.__init_hello_box();
                 this.__init_btns();
             },
-
             __init_wrapper: function () {
                 this.__wrapper = document.createElement("div");
                 this.__wrapper.setAttribute("class", "page-hello-page centered-outer");
             },
-
             __init_hello_box: function () {
                 this.__hello_box = document.createElement("div");
                 this.__hello_box.setAttribute("class", "page-hello-box centered-inner");
                 this.__wrapper.appendChild(this.__hello_box);
             },
-
             __init_btns: function () {
                 this.__btn_reg = new button({
                     text: "registration"
@@ -76,7 +68,6 @@
                     nav.open("auth");
                 })
             },
-
             wrapper: function(){
                 return this.__wrapper;
             }

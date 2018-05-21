@@ -31,12 +31,9 @@
 
         var auth = page.inherit({
             constructor: function auth(_options) {
-                var options = {
-
-                };
+                var options = {};
                 Object.extend(options, _options);
                 page.prototype.constructor.call(this, options);
-                //this._init();
             },
             destructor: function () {
                 this.__hello_box.destructor();

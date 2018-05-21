@@ -12,13 +12,11 @@
         var request = basic.inherit({
             constructor: function page(_options) {
                 var base = {
-                    //token_id: -1,
                     command_addr:  []
                 };
                 Object.extend(base, _options);
                 basic.prototype.constructor.call(this, base);
                 this._client_id = dispatcher.add(this.__core_handler.bind(this));
-                //this.__token_id = base.token_id;
                 this.__command_addr = base.command_addr;
             },
             destructor: function () {

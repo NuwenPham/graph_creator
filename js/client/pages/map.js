@@ -41,11 +41,9 @@
 
                 this.__map_id = _query;
             },
-
             destructor: function () {
                 page.prototype.destructor.call(this);
             },
-
             _after_init: function () {
                 page.prototype._after_init.call(this);
                 this.__init_content();
@@ -83,7 +81,6 @@
                 var y = (_event.clientY - height - marker_offset_y) * ratio_2;
                 var res_x  = center.lat + x;
                 var res_y  = center.lng + y;
-
 
                 var rnd = Math.random() > 0.5;
                 var m = new marker({

@@ -5,5 +5,5 @@ module.exports = {
     auth: require("./requests/auth").requests,
     ccp: require("./requests/ccp").requests,
     user: require("./requests/user").requests,
-    mapper: require("./requests/mapper").requests,
+    mapper: require("./requests/mapper").requests
 };
