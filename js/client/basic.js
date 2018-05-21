@@ -2,9 +2,9 @@
  * Created by Cubla on 07.08.2017.
  */
 (function(_export) {
-    var name = "js/basic";
+    var name = "js/client/basic";
     var libs = [
-        "js/baseClass"
+        "js/client/baseClass"
     ];
     define(name, libs, function () {
         return Base.inherit({

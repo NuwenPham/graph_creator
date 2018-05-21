@@ -4,10 +4,14 @@
 var request = require("request");
 
 /* CONSTANTS */
-var HOST = "esi.evetech.net";
-var PROTO = "http:";
-var SERVER = "tranquility";
-var CONTENT_TYPE = "application/json";
+var HOST = config.eve_esi_server.host;
+var PROTO = config.eve_esi_server.proto;
+var SERVER = config.eve_esi_server.server;
+var CONTENT_TYPE = config.eve_esi_server.content_type;
+var PORT = config.eve_esi_server.port;
+
+var COUNT_RQUESTS_BY_TICK = config.poll_settings.count_requests_by_tick;
+var POLL_TIMEOUT = config.poll_settings.timeout;
 
 var _GET = 0;
 var _POST = 1;
@@ -20,8 +24,8 @@ var _DELETE = 3;
 var counter = 0;
 var reqsys = function () {
     this.__queue = [];
-    this.__request_count_in_time = 5;
-    this.__poll_timeout = 900;
+    this.__request_count_in_time = COUNT_RQUESTS_BY_TICK;
+    this.__poll_timeout = POLL_TIMEOUT;
 
     // ----------------------------------------
     //  METHOD |   | GET | POST | PUT | DELETE |
@@ -30,7 +34,6 @@ var reqsys = function () {
     // --------|---|-----|------|-----|--------|
     //  PUBLIC | 0 |  00 |  01  | 02  |   03   |
     //  BEARER | 1 |  10 |  11  | 12  |   13   |
-
     this.__methods = [
         [_esi_public_get_request, _esi_bearer_get_request],
         ["post_public", _esi_bearer_post_request],
@@ -188,7 +191,7 @@ var _esi_bearer_get_request = function (_access_token, _path, _options, _callbac
     var options = {
         url: addr,
         pool: {maxSockets: Infinity},
-        port: 443,
+        port: PORT,
         headers: {
             Authorization: "Bearer " + _access_token,
             "Content-Type": CONTENT_TYPE,

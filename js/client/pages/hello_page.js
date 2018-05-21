@@ -7,13 +7,13 @@
 (function (_export) {
     var name = "js/client/pages/hello_page";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/ui/button"
     ];
 
     load_css("css/hello_page.css");
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var button = require("js/client/ui/button");
         var hello_page = basic.inherit({
             constructor: function hello_page(_options) {

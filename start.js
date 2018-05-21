@@ -7,6 +7,6 @@ requirejs.config({
 });
 
 // main.js
-require(["js/main"], function(){
-    var main = require("js/main");
+require(["js/client/main"], function(){
+    require("js/client/main");
 });

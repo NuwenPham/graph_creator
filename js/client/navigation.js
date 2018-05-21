@@ -7,11 +7,11 @@
 (function (_export) {
     var name = "js/client/navigation";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/pages_list"
     ];
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var pages_map = require("js/client/pages_list");
         var navigation = basic.inherit({
             constructor: function navigation(_options) {

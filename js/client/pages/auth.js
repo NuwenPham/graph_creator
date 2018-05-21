@@ -1,7 +1,7 @@
 (function (_export) {
     var name = "js/client/pages/auth";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/ui/button",
         "js/client/ui/lay",
         "js/client/ui/input"
@@ -9,7 +9,7 @@
 
     load_css("css/hello_page.css");
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var button = require("js/client/ui/button");
         var input = require("js/client/ui/input");
         var lay = require("js/client/ui/lay");

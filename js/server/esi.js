@@ -3,15 +3,22 @@
  */
 var request = require('request');
 
+var CLIENT_ID = config.eve_application_data.client_id;
+var SECRET_KEY = config.eve_application_data.secret_key;
+
+var SSO_HOST = config.eve_sso_server.host;
+var SSO_PROTO = config.eve_sso_server.proto;
+var SSO_CONTENT_TYPE = config.eve_sso_server.content_type;
+
 var __esi_oauth_token = function (_code, _callback) {
-    var res = _CLIENT_ID + ":" + _SECRET_KEY;
+    var res = CLIENT_ID + ":" + SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
-        url: 'https://login.eveonline.com/oauth/token',
+        url: SSO_PROTO + "//"+SSO_HOST+"/oauth/token",
         headers: {
             Authorization: "Basic " + encoded,
-            "Content-Type": "application/x-www-form-urlencoded",
-            Host: "login.eveonline.com"
+            "Content-Type": SSO_CONTENT_TYPE,
+            Host: SSO_HOST
         },
         form: {
             grant_type: "authorization_code",
@@ -26,10 +33,10 @@ var __esi_oauth_token = function (_code, _callback) {
 
 var __esi_oauth_verify = function (_access_token, _callback) {
     var options = {
-        url: 'https://login.eveonline.com/oauth/verify',
+        url: SSO_PROTO + "//" + SSO_HOST + "/oauth/verify",
         headers: {
             Authorization: "Bearer " + _access_token,
-            Host: "login.eveonline.com"
+            Host: SSO_HOST
         }
     };
 
@@ -39,14 +46,14 @@ var __esi_oauth_verify = function (_access_token, _callback) {
 };
 
 var __sso_oath_refresh_token = function (_refresh_token, _callback) {
-    var res = _CLIENT_ID + ":" + _SECRET_KEY;
+    var res = CLIENT_ID + ":" + SECRET_KEY;
     var encoded = new Buffer(res).toString('base64');
     var options = {
-        url: 'https://login.eveonline.com/oauth/token',
+        url: SSO_PROTO + "//" + SSO_HOST + "/oauth/token",
         headers: {
             Authorization: "Basic " + encoded,
-            "Content-Type": "application/json",
-            Host: "login.eveonline.com"
+            "Content-Type": SSO_CONTENT_TYPE,
+            Host: SSO_HOST
         },
         form: {
             grant_type: "refresh_token",

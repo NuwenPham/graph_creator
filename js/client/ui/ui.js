@@ -4,12 +4,12 @@
 (function (_export) {
     var name = "js/client/ui/ui";
     var libs = [
-        "js/basic"
+        "js/client/basic"
     ];
 
     load_css("css/button.css");
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var ui = basic.inherit({
             constructor: function ui(_options) {
                 var options = {};

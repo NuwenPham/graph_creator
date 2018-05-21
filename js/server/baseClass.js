@@ -8,7 +8,7 @@ var common_class = function () {};
 common_class.inherit = function (_class) {
 	var that = this;
 	var base = function () {};
-	var newclass = _class && _class.constructor ? proto.constructor : function () {
+	var newclass = _class && _class.constructor ? _class.constructor : function () {
 		that.apply(this, arguments);
 	};
 
@@ -17,7 +17,7 @@ common_class.inherit = function (_class) {
 
 	for (var k in _class) {
 		if (typeof _class[k] === "object" && !(_class[k] instanceof Array) && _class[k] !== undefined) {
-			fn[k] = Object.extend(true, {}, base.prototype[k], proto[k]);
+			fn[k] = Object.extend(true, {}, base.prototype[k], _class[k]);
 		} else {
 			fn[k] = _class[k];
 		}
@@ -34,7 +34,7 @@ common_class.inherit = function (_class) {
 	return newclass;
 };
 
-window.Base = common_class.inherit({
+global.Base = common_class.inherit({
 	constructor: function () {
 		if (!(this instanceof common_class)) {
 			throw new Error("new not found");

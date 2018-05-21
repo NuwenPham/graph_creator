@@ -5,10 +5,12 @@ var WebSocketServer = require('websocket').server;
 var http = require('http');
 var basic = require('./../basic.js');
 
+var LISTENER_PORT = config.server_listener.port;
+
 var connector = basic.inherit({
     constructor: function connector(_options) {
         var options = {
-            port: 1400
+            port: LISTENER_PORT
         };
 
         Object.extend(options, _options);
@@ -28,7 +30,7 @@ var connector = basic.inherit({
             // хз че тут
         });
 
-        this._server.listen(1400, function() { });
+        this._server.listen(this._port, function() { });
 
         this._wsServer = new WebSocketServer({
             httpServer: this._server

@@ -10,7 +10,7 @@
 (function (_export) {
     var name = "js/client/pages/add_map";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/ui/button",
         "js/client/ui/lay",
         "js/client/ui/input",
@@ -23,7 +23,7 @@
     define(name, libs, function () {
         var page = require("js/client/pages/page");
 
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var button = require("js/client/ui/button");
         var input = require("js/client/ui/input");
         var lay = require("js/client/ui/lay");

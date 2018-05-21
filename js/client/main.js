@@ -3,11 +3,10 @@
  */
 (function(_export){
     var libs = [
-        "js/utils/pixi.min.js",
-        "js/utils/leaflet/leaflet-src.js",
+        "js/client/utils/leaflet/leaflet-src.js",
 
-        "js/baseClass",
-        "js/types/point",
+        "js/client/baseClass",
+        "js/client/types/point",
         "js/client/dispatcher",
         "js/client/navigation"
     ];
@@ -18,7 +17,7 @@
         var v = Object.create(null);
         _export.v = v;
 
-        var point = require("js/types/point");
+        var point = require("js/client/types/point");
         var navigation = require("js/client/navigation");
         v.point = point;
 

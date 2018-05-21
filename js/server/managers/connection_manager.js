@@ -11,7 +11,6 @@ var connection_manager = basic.inherit({
         basic.prototype.constructor.call(this, options);
 
         this.__connections = {};
-        this.__init();
     },
     destructor: function () {
         basic.prototype.destructor.call(this);

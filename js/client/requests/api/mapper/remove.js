@@ -4,7 +4,7 @@
 (function (_export) {
     var name = "js/client/requests/api/mapper/remove";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/requests/request",
     ];
 

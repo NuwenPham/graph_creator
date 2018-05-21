@@ -4,11 +4,11 @@
 (function (_export) {
     var name = "js/client/requests/request";
     var libs = [
-        "js/basic"
+        "js/client/basic"
     ];
 
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var request = basic.inherit({
             constructor: function page(_options) {
                 var base = {

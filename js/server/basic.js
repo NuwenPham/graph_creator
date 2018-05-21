@@ -4,7 +4,7 @@
 
 require("./baseClass");
 
-var basic = global.window.Base.inherit({
+var basic = Base.inherit({
     constructor: function (_opt) {
         this._opts = Object.extend({}, _opt);
         Base.prototype.constructor.call(this, _opt);

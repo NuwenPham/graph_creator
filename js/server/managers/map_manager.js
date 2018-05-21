@@ -14,8 +14,6 @@ var Maps = basic.inherit({
         this.__index_on_id = [];
         this.__name_on_id = {};
         this.__count = 0;
-        
-        this.__init();
     },
     destructor: function () {
         basic.prototype.destructor.call(this);

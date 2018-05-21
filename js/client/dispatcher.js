@@ -4,11 +4,11 @@
 (function (_export) {
     var name = "js/client/dispatcher";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/connector"
     ];
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var connector = require("js/client/connector");
         var counter = 0;
         var dispatcher = basic.inherit({

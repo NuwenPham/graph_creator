@@ -7,14 +7,14 @@
 (function (_export) {
     var name = "js/client/pages/error_page";
     var libs = [
-        "js/basic",
+        "js/client/basic",
         "js/client/ui/ll/map",
         "js/client/ui/ll/marker"
     ];
     // load_css("css/error_page.css");
 
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var map = require("js/client/ui/ll/map");
         var marker = require("js/client/ui/ll/marker");
 

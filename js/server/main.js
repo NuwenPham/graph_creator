@@ -1,3 +1,4 @@
+global.config = require("./config.js");
 require("./globals.js");
 
 // requests

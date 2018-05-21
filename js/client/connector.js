@@ -5,16 +5,18 @@
     var name = "js/client/connector";
 
     var libs = [
-        "js/basic"
+        "js/client/config",
+        "js/client/basic"
     ];
+
     define(name, libs, function () {
-        var basic = require("js/basic");
+        var basic = require("js/client/basic");
         var connector = basic.inherit({
             constructor: function connector(_options) {
                 var options = {
-                    protocol: "ws",
-                    host: "127.0.0.1",
-                    port: "1400"
+                    protocol: config.connection.soket.proto,
+                    host: config.connection.soket.host,
+                    port: config.connection.soket.port
                 };
                 Object.extend(options, _options);
                 basic.prototype.constructor.call(this, options);
